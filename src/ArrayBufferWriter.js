@@ -25,7 +25,7 @@
  * @param {!OutputStream} stream
  *     The stream that data will be written to.
  */
-export function ArrayBufferWriter(stream) {
+function ArrayBufferWriter(stream) {
 
     /**
      * Reference to this ArrayBufferWriter.
@@ -123,4 +123,6 @@ export function ArrayBufferWriter(stream) {
  * @constant
  * @type {!number}
  */
-export const DEFAULT_BLOB_LENGTH = 6048;
+ArrayBufferWriter.DEFAULT_BLOB_LENGTH = 6048;
+
+export { ArrayBufferWriter };
