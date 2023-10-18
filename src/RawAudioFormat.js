@@ -143,4 +143,4 @@ RawAudioFormat.parse = function parseFormat(mimetype) {
 
 };
 
-export default RawAudioFormat;
+export { RawAudioFormat };

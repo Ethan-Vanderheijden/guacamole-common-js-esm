@@ -323,4 +323,4 @@ Event.Target = function Target() {
 
 };
 
-export default Event;
+export { Event };

@@ -17,9 +17,9 @@
  * under the License.
  */
 
-import Status from './Status.js';
-import Parser from './Parser.js';
-import UTF8Parser from './UTF8Parser.js';
+import { Status } from './Status.js';
+import { Parser } from './Parser.js';
+import { UTF8Parser } from './UTF8Parser.js';
 
 /**
  * Core object providing abstract communication for Guacamole. This object

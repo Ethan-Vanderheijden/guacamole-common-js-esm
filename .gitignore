@@ -1,6 +1,8 @@
 /*
 /*/
 !src/
+!test/
 
 !/.gitignore
 !README
+!package.json

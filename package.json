@@ -1,0 +1,30 @@
+{
+  "name": "guacamole-common-js-esm",
+  "version": "1.0.0",
+  "description": "guacamole-common-js ported to ESM",
+  "main": "index.js",
+  "type": "module",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "node test/test_exports.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ethan-Vanderheijden/guacamole-common-js-esm.git"
+  },
+  "keywords": [
+    "apache",
+    "guacamole",
+    "guacamole-common-js",
+    "ESM",
+    "javascript"
+  ],
+  "author": "Ethan Van Der Heijden",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/Ethan-Vanderheijden/guacamole-common-js-esm/issues"
+  },
+  "homepage": "https://github.com/Ethan-Vanderheijden/guacamole-common-js-esm#readme"
+}

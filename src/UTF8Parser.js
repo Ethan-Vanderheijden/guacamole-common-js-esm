@@ -24,7 +24,7 @@
  *
  * @constructor
  */
-export default function UTF8Parser() {
+export function UTF8Parser() {
 
     /**
      * The number of bytes remaining for the current codepoint.

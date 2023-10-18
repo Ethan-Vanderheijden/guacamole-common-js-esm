@@ -105,4 +105,4 @@ VideoPlayer.getInstance = function getInstance(stream, layer, mimetype) {
 
 };
 
-export default VideoPlayer;
+export { VideoPlayer };

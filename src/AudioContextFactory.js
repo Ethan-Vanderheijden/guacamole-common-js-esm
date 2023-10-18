@@ -76,4 +76,4 @@ const AudioContextFactory = {
 
 };
 
-export default AudioContextFactory;
+export { AudioContextFactory };

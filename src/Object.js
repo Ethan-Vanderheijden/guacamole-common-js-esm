@@ -207,4 +207,4 @@ Object.ROOT_STREAM = '/';
  */
 Object.STREAM_INDEX_MIMETYPE = 'application/vnd.glyptodon.guacamole.stream-index+json';
 
-export default Object;
+export { Object };

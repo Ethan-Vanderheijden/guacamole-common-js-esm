@@ -17,8 +17,8 @@
  * under the License.
  */
 
-import ArrayBufferReader from './ArrayBufferReader.js';
-import UTF8Parser from './UTF8Parser.js';
+import { ArrayBufferReader } from './ArrayBufferReader.js';
+import { UTF8Parser } from './UTF8Parser.js';
 
 /**
  * A reader which automatically handles the given input stream, returning
@@ -29,7 +29,7 @@ import UTF8Parser from './UTF8Parser.js';
  * @param {!InputStream} stream
  *     The stream that data will be read from.
  */
-export default function(stream) {
+export function StringReader(stream) {
 
     /**
      * Reference to this InputStream.

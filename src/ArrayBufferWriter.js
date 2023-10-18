@@ -25,7 +25,7 @@
  * @param {!OutputStream} stream
  *     The stream that data will be written to.
  */
-export default function(stream) {
+export function ArrayBufferWriter(stream) {
 
     /**
      * Reference to this ArrayBufferWriter.

@@ -943,3 +943,5 @@ OnScreenKeyboard.Key = function(template, name) {
     this.requires = template.requires || [];
 
 };
+
+export { OnScreenKeyboard };

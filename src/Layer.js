@@ -1149,4 +1149,4 @@ Layer.Pixel = function(r, g, b, a) {
 
 };
 
-export default Layer;
+export { Layer };

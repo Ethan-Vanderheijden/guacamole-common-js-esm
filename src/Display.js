@@ -17,9 +17,9 @@
  * under the License.
  */
 
-import BlobReader from './BlobReader.js';
-import DataURIReader from './DataURIReader.js';
-import Layer from './Layer.js';
+import { BlobReader } from './BlobReader.js';
+import { DataURIReader } from './DataURIReader.js';
+import { Layer } from './Layer.js';
 
 /**
  * The Guacamole display. The display does not deal with the Guacamole
@@ -2193,4 +2193,4 @@ Display.Statistics = function Statistics(template) {
 
 };
 
-export default Display;
+export { Display };

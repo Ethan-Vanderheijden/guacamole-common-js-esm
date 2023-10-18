@@ -30,7 +30,7 @@
  * @param {!string} mimetype
  *     The mimetype of the data being received.
  */
-export default function(stream, mimetype) {
+export function DataURIReader(stream, mimetype) {
 
     /**
      * Reference to this DataURIReader.

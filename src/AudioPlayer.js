@@ -17,10 +17,10 @@
  * under the License.
  */
 
-import InputStream from './InputStream.js';
-import ArrayBufferReader from './ArrayBufferReader.js';
-import AudioContextFactory from './AudioContextFactory.js';
-import RawAudioFormat from './RawAudioFormat.js';
+import { InputStream } from './InputStream.js';
+import { ArrayBufferReader } from './ArrayBufferReader.js';
+import { AudioContextFactory } from './AudioContextFactory.js';
+import { RawAudioFormat } from './RawAudioFormat.js';
 
 /**
  * Abstract audio player which accepts, queues and plays back arbitrary audio
@@ -509,6 +509,6 @@ RawAudioPlayer.getSupportedTypes = function getSupportedTypes() {
 };
 
 export {
-    AudioPlayer as default,
+    AudioPlayer,
     RawAudioPlayer
 };

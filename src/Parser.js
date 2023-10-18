@@ -345,4 +345,4 @@ Parser.toInstruction = function toInstruction(elements) {
 
 };
 
-export default Parser;
+export { Parser };

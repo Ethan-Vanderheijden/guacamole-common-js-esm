@@ -17,7 +17,7 @@
  * under the License.
  */
 
-import ArrayBufferWriter from './ArrayBufferWriter.js';
+import { ArrayBufferWriter } from './ArrayBufferWriter.js';
 
 /**
  * A writer which automatically writes to the given output stream with the
@@ -27,7 +27,7 @@ import ArrayBufferWriter from './ArrayBufferWriter.js';
  * @param {!OutputStream} stream
  *     The stream that data will be written to.
  */
-export default function BlobWriter(stream) {
+export function BlobWriter(stream) {
 
     /**
      * Reference to this BlobWriter.

@@ -115,4 +115,4 @@ Position.fromClientPosition = function fromClientPosition(element, clientX, clie
     return position;
 };
 
-export default Position;
+export { Position };

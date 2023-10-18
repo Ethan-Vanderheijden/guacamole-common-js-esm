@@ -17,7 +17,7 @@
  * under the License.
  */
 
-import InputStream from './InputStream.js';
+import { InputStream } from './InputStream.js';
 
 /**
  * A reader which automatically handles the given input stream, assembling all
@@ -32,7 +32,7 @@ import InputStream from './InputStream.js';
  * @param {!string} mimetype
  *     The mimetype of the blob being built.
  */
-export default function BlobReader(stream, mimetype) {
+export function BlobReader(stream, mimetype) {
 
     /**
      * Reference to this InputStream.

@@ -332,4 +332,4 @@ KeyEventInterpreter.KeyEvent = function KeyEvent(template) {
 
 };
 
-export default KeyEventInterpreter;
+export { KeyEventInterpreter };

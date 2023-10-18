@@ -26,7 +26,7 @@
  * @param {!InputStream} stream
  *     The stream that data will be read from.
  */
-export default function ArrayBufferReader(stream) {
+export function ArrayBufferReader(stream) {
 
     /**
      * Reference to this InputStream.

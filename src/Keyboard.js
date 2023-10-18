@@ -1522,4 +1522,4 @@ Keyboard.ModifierState.fromKeyboardEvent = function(e) {
     
 };
 
-export default Keyboard;
+export { Keyboard };

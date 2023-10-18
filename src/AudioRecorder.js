@@ -17,10 +17,10 @@
  * under the License.
  */
 
-import ArrayBufferWriter from './ArrayBufferWriter.js';
-import AudioContextFactory from './AudioContextFactory.js';
-import Status from './Status.js';
-import RawAudioFormat from './RawAudioFormat.js';
+import { ArrayBufferWriter } from './ArrayBufferWriter.js';
+import { AudioContextFactory } from './AudioContextFactory.js';
+import { Status } from './Status.js';
+import { RawAudioFormat } from './RawAudioFormat.js';
 
 /**
  * Abstract audio recorder which streams arbitrary audio data to an underlying
@@ -606,6 +606,4 @@ RawAudioRecorder.getSupportedTypes = function getSupportedTypes() {
 
 };
 
-export {
-    AudioRecorder as default,
-}
+export { AudioRecorder, RawAudioRecorder }

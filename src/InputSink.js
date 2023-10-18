@@ -27,7 +27,7 @@
  *
  * @constructor
  */
-export default function InputSink() {
+export function InputSink() {
 
     /**
      * Reference to this instance of InputSink.

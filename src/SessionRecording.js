@@ -17,9 +17,9 @@
  * under the License.
  */
 
-import KeyEventInterpreter from './KeyEventInterpreter.js';
-import Parser from './Parser.js';
-import Client from './Client.js';
+import { KeyEventInterpreter } from './KeyEventInterpreter.js';
+import { Parser } from './Parser.js';
+import { Client } from './Client.js';
 import { Tunnel } from './Tunnel.js';
 
 /**
@@ -111,7 +111,7 @@ function SessionRecording(source, refreshInterval) {
      * All frames parsed from the provided blob.
      *
      * @private
-     * @type {!Frame[]}
+     * @type {!_Frame[]}
      */
     var frames = [];
 
@@ -129,9 +129,9 @@ function SessionRecording(source, refreshInterval) {
      * SessionRecording for playback of the session recording.
      *
      * @private
-     * @type {!PlaybackTunnel}
+     * @type {!_PlaybackTunnel}
      */
-    var playbackTunnel = new PlaybackTunnel();
+    var playbackTunnel = new _PlaybackTunnel();
 
     /**
      * Client instance used for visible playback of the session
@@ -427,7 +427,7 @@ function SessionRecording(source, refreshInterval) {
             var timestamp = parseInt(args[0]);
 
             // Add a new frame containing the instructions read since last frame
-            var frame = new Frame(timestamp, frameStart, frameEnd);
+            var frame = new _Frame(timestamp, frameStart, frameEnd);
             frames.push(frame);
             frameStart = frameEnd;
 
@@ -1207,7 +1207,7 @@ function SessionRecording(source, refreshInterval) {
  *     The byte offset within the blob of character which follows the last
  *     character of the last instruction of this frame.
  */
-function Frame(timestamp, start, end) {
+SessionRecording._Frame = function _Frame(timestamp, start, end) {
 
     /**
      * Whether this frame should be used as a keyframe if possible. This value
@@ -1266,13 +1266,13 @@ function Frame(timestamp, start, end) {
  * @constructor
  * @augments {Tunnel}
  */
-function PlaybackTunnel() {
+SessionRecording._PlaybackTunnel = function _PlaybackTunnel() {
 
     /**
      * Reference to this PlaybackTunnel.
      *
      * @private
-     * @type {!PlaybackTunnel}
+     * @type {!_PlaybackTunnel}
      */
     var tunnel = this;
 
@@ -1307,4 +1307,4 @@ function PlaybackTunnel() {
 
 };
 
-export default SessionRecording;
+export { SessionRecording };

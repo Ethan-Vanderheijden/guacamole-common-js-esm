@@ -17,8 +17,8 @@
  * under the License.
  */
 
-import Event from './Event.js';
-import Position from './Position.js';
+import { Event } from './Event.js';
+import { Position } from './Position.js';
 
 /**
  * Provides cross-browser multi-touch events for a given element. The events of
@@ -280,4 +280,4 @@ Touch.Event = function TouchEvent(type, event, state) {
 
 };
 
-export default Touch;
+export { Touch };

@@ -319,4 +319,4 @@ Status.Code.fromWebSocketCode = function fromWebSocketCode(code) {
 
 };
 
-export default Status;
+export { Status };

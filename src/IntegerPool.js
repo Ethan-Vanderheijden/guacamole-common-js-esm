@@ -22,7 +22,7 @@
  * are in use, and previously-used integers when possible.
  * @constructor 
  */
-export default function() {
+export function IntegerPool() {
 
     /**
      * Reference to this integer pool.

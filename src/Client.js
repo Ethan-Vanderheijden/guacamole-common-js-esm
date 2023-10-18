@@ -17,16 +17,16 @@
  * under the License.
  */
 
-import InputStream from './InputStream.js';
-import OutputStream from './OutputStream.js';
-import Status from './Status.js';
-import AudioPlayer from './AudioPlayer.js';
-import IntegerPool from './IntegerPool.js';
-import Layer from './Layer.js';
-import Parser from './Parser.js';
-import Display from './Display.js';
-import VideoPlayer from './VideoPlayer.js';
-import Object from './Object.js';
+import { InputStream } from './InputStream.js';
+import { OutputStream } from './OutputStream.js';
+import { Status } from './Status.js';
+import { AudioPlayer } from './AudioPlayer.js';
+import { IntegerPool } from './IntegerPool.js';
+import { Layer } from './Layer.js';
+import { Parser } from './Parser.js';
+import { Display } from './Display.js';
+import { VideoPlayer } from './VideoPlayer.js';
+import { Object } from './Object.js';
 
 /**
  * Guacamole protocol client. Given a {@link Tunnel},
@@ -271,7 +271,7 @@ function Client(tunnel) {
 
         layers = {};
 
-        // Import state of each layer/buffer
+        // import { state }of each layer/buffer
         for (key in state.layers) {
 
             index = parseInt(key);
@@ -2088,4 +2088,4 @@ Client.Message = {
     
 };
 
-export default Client;
+export { Client };

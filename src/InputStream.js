@@ -28,7 +28,7 @@
  * @param {!number} index
  *     The index of this stream.
  */
-export default function(client, index) {
+export function InputStream(client, index) {
 
     /**
      * Reference to this stream.

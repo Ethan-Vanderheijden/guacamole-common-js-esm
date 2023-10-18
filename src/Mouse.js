@@ -17,8 +17,8 @@
  * under the License.
  */
 
-import Event from './Event.js';
-import Position from './Position.js';
+import { Event } from './Event.js';
+import { Position } from './Position.js';
 
 /**
  * Provides cross-browser mouse events for a given element. The events of
@@ -1265,4 +1265,4 @@ Mouse.Touchscreen = function Touchscreen(element) {
 
 };
 
-export default Mouse;
+export { Mouse };

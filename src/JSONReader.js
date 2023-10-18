@@ -17,7 +17,7 @@
  * under the License.
  */
 
-import StringReader from './StringReader.js';
+import { StringReader } from './StringReader.js';
 
 /**
  * A reader which automatically handles the given input stream, assembling all
@@ -29,7 +29,7 @@ import StringReader from './StringReader.js';
  * @param {InputStream} stream
  *     The stream that JSON will be read from.
  */
-export default function guacamoleJSONReader(stream) {
+export function JSONReader(stream) {
 
     /**
      * Reference to this JSONReader.
