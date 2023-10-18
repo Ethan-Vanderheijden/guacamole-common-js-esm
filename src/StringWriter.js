@@ -17,33 +17,33 @@
  * under the License.
  */
 
-var Guacamole = Guacamole || {};
+import ArrayBufferWriter from './ArrayBufferWriter.js';
 
 /**
  * A writer which automatically writes to the given output stream with text
  * data.
  * 
  * @constructor
- * @param {!Guacamole.OutputStream} stream
+ * @param {!OutputStream} stream
  *     The stream that data will be written to.
  */
-Guacamole.StringWriter = function(stream) {
+export default function(stream) {
 
     /**
-     * Reference to this Guacamole.StringWriter.
+     * Reference to this StringWriter.
      *
      * @private
-     * @type {!Guacamole.StringWriter}
+     * @type {!StringWriter}
      */
     var guac_writer = this;
 
     /**
-     * Wrapped Guacamole.ArrayBufferWriter.
+     * Wrapped ArrayBufferWriter.
      *
      * @private
-     * @type {!Guacamole.ArrayBufferWriter}
+     * @type {!ArrayBufferWriter}
      */
-    var array_writer = new Guacamole.ArrayBufferWriter(stream);
+    var array_writer = new ArrayBufferWriter(stream);
 
     /**
      * Internal buffer for UTF-8 output.
@@ -197,7 +197,7 @@ Guacamole.StringWriter = function(stream) {
      * Fired for received data, if acknowledged by the server.
      *
      * @event
-     * @param {!Guacamole.Status} status
+     * @param {!Status} status
      *     The status of the operation.
      */
     this.onack = null;

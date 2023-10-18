@@ -17,8 +17,6 @@
  * under the License.
  */
 
-var Guacamole = Guacamole || {};
-
 /**
  * Parser that decodes UTF-8 text from a series of provided ArrayBuffers.
  * Multi-byte characters that continue from one buffer to the next are handled
@@ -26,7 +24,7 @@ var Guacamole = Guacamole || {};
  *
  * @constructor
  */
-Guacamole.UTF8Parser = function UTF8Parser() {
+export default function UTF8Parser() {
 
     /**
      * The number of bytes remaining for the current codepoint.

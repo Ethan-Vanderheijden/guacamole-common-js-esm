@@ -17,14 +17,12 @@
  * under the License.
  */
 
-var Guacamole = Guacamole || {};
-
 /**
  * Integer pool which returns consistently increasing integers while integers
  * are in use, and previously-used integers when possible.
  * @constructor 
  */
-Guacamole.IntegerPool = function() {
+export default function() {
 
     /**
      * Reference to this integer pool.

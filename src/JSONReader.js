@@ -17,35 +17,35 @@
  * under the License.
  */
 
-var Guacamole = Guacamole || {};
+import StringReader from './StringReader.js';
 
 /**
  * A reader which automatically handles the given input stream, assembling all
  * received blobs into a JavaScript object by appending them to each other, in
  * order, and decoding the result as JSON. Note that this object will overwrite
- * any installed event handlers on the given Guacamole.InputStream.
+ * any installed event handlers on the given InputStream.
  * 
  * @constructor
- * @param {Guacamole.InputStream} stream
+ * @param {InputStream} stream
  *     The stream that JSON will be read from.
  */
-Guacamole.JSONReader = function guacamoleJSONReader(stream) {
+export default function guacamoleJSONReader(stream) {
 
     /**
-     * Reference to this Guacamole.JSONReader.
+     * Reference to this JSONReader.
      *
      * @private
-     * @type {!Guacamole.JSONReader}
+     * @type {!JSONReader}
      */
     var guacReader = this;
 
     /**
-     * Wrapped Guacamole.StringReader.
+     * Wrapped StringReader.
      *
      * @private
-     * @type {!Guacamole.StringReader}
+     * @type {!StringReader}
      */
-    var stringReader = new Guacamole.StringReader(stream);
+    var stringReader = new StringReader(stream);
 
     /**
      * All JSON read thus far.
@@ -56,21 +56,21 @@ Guacamole.JSONReader = function guacamoleJSONReader(stream) {
     var json = '';
 
     /**
-     * Returns the current length of this Guacamole.JSONReader, in characters.
+     * Returns the current length of this JSONReader, in characters.
      *
      * @return {!number}
-     *     The current length of this Guacamole.JSONReader.
+     *     The current length of this JSONReader.
      */
     this.getLength = function getLength() {
         return json.length;
     };
 
     /**
-     * Returns the contents of this Guacamole.JSONReader as a JavaScript
+     * Returns the contents of this JSONReader as a JavaScript
      * object.
      *
      * @return {object}
-     *     The contents of this Guacamole.JSONReader, as parsed from the JSON
+     *     The contents of this JSONReader, as parsed from the JSON
      *     contents of the input stream.
      */
     this.getJSON = function getJSON() {

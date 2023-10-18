@@ -17,25 +17,23 @@
  * under the License.
  */
 
-var Guacamole = Guacamole || {};
-
 /**
  * Abstract stream which can receive data.
  * 
  * @constructor
- * @param {!Guacamole.Client} client
+ * @param {!Client} client
  *     The client owning this stream.
  *
  * @param {!number} index
  *     The index of this stream.
  */
-Guacamole.OutputStream = function(client, index) {
+export default function(client, index) {
 
     /**
      * Reference to this stream.
      *
      * @private
-     * @type {!Guacamole.OutputStream}
+     * @type {!OutputStream}
      */
     var guac_stream = this;
 
@@ -50,7 +48,7 @@ Guacamole.OutputStream = function(client, index) {
      * that a stream operation has completed, or an error has occurred.
      * 
      * @event
-     * @param {!Guacamole.Status} status
+     * @param {!Status} status
      *     The status of the operation.
      */
     this.onack = null;

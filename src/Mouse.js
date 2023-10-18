@@ -17,16 +17,17 @@
  * under the License.
  */
 
-var Guacamole = Guacamole || {};
+import Event from './Event.js';
+import Position from './Position.js';
 
 /**
  * Provides cross-browser mouse events for a given element. The events of
  * the given element are automatically populated with handlers that translate
  * mouse events into a non-browser-specific event provided by the
- * Guacamole.Mouse instance.
+ * Mouse instance.
  *
  * @example
- * var mouse = new Guacamole.Mouse(client.getDisplay().getElement());
+ * var mouse = new Mouse(client.getDisplay().getElement());
  *
  * // Forward all mouse interaction over Guacamole connection
  * mouse.onEach(['mousedown', 'mousemove', 'mouseup'], function sendMouseEvent(e) {
@@ -40,19 +41,19 @@ var Guacamole = Guacamole || {};
  * });
  *
  * @constructor
- * @augments Guacamole.Mouse.Event.Target
+ * @augments Mouse.Event.Target
  * @param {!Element} element
  *     The Element to use to provide mouse events.
  */
-Guacamole.Mouse = function Mouse(element) {
+function Mouse(element) {
 
-    Guacamole.Mouse.Event.Target.call(this);
+    Mouse.Event.Target.call(this);
 
     /**
-     * Reference to this Guacamole.Mouse.
+     * Reference to this Mouse.
      *
      * @private
-     * @type {!Guacamole.Mouse}
+     * @type {!Mouse}
      */
     var guac_mouse = this;
 
@@ -87,16 +88,16 @@ Guacamole.Mouse = function Mouse(element) {
     this.PIXELS_PER_PAGE = this.PIXELS_PER_LINE * 16;
 
     /**
-     * Array of {@link Guacamole.Mouse.State} button names corresponding to the
+     * Array of {@link Mouse.State} button names corresponding to the
      * mouse button indices used by DOM mouse events.
      *
      * @private
      * @type {!string[]}
      */
     var MOUSE_BUTTONS = [
-        Guacamole.Mouse.State.Buttons.LEFT,
-        Guacamole.Mouse.State.Buttons.MIDDLE,
-        Guacamole.Mouse.State.Buttons.RIGHT
+        Mouse.State.Buttons.LEFT,
+        Mouse.State.Buttons.MIDDLE,
+        Mouse.State.Buttons.RIGHT
     ];
 
     /**
@@ -120,19 +121,19 @@ Guacamole.Mouse = function Mouse(element) {
 
     // Block context menu so right-click gets sent properly
     element.addEventListener("contextmenu", function(e) {
-        Guacamole.Event.DOMEvent.cancelEvent(e);
+        Event.DOMEvent.cancelEvent(e);
     }, false);
 
     element.addEventListener("mousemove", function(e) {
 
         // If ignoring events, decrement counter
         if (ignore_mouse) {
-            Guacamole.Event.DOMEvent.cancelEvent(e);
+            Event.DOMEvent.cancelEvent(e);
             ignore_mouse--;
             return;
         }
 
-        guac_mouse.move(Guacamole.Position.fromClientPosition(element, e.clientX, e.clientY), e);
+        guac_mouse.move(Position.fromClientPosition(element, e.clientX, e.clientY), e);
 
     }, false);
 
@@ -140,7 +141,7 @@ Guacamole.Mouse = function Mouse(element) {
 
         // Do not handle if ignoring events
         if (ignore_mouse) {
-            Guacamole.Event.DOMEvent.cancelEvent(e);
+            Event.DOMEvent.cancelEvent(e);
             return;
         }
 
@@ -154,7 +155,7 @@ Guacamole.Mouse = function Mouse(element) {
 
         // Do not handle if ignoring events
         if (ignore_mouse) {
-            Guacamole.Event.DOMEvent.cancelEvent(e);
+            Event.DOMEvent.cancelEvent(e);
             return;
         }
 
@@ -185,7 +186,7 @@ Guacamole.Mouse = function Mouse(element) {
 
     // Override selection on mouse event element.
     element.addEventListener("selectstart", function(e) {
-        Guacamole.Event.DOMEvent.cancelEvent(e);
+        Event.DOMEvent.cancelEvent(e);
     }, false);
 
     // Ignore all pending mouse events when touch events are the apparent source
@@ -227,7 +228,7 @@ Guacamole.Mouse = function Mouse(element) {
 
             // Repeatedly click the up button until insufficient delta remains
             do {
-                guac_mouse.click(Guacamole.Mouse.State.Buttons.UP);
+                guac_mouse.click(Mouse.State.Buttons.UP);
                 scroll_delta += guac_mouse.scrollThreshold;
             } while (scroll_delta <= -guac_mouse.scrollThreshold);
 
@@ -241,7 +242,7 @@ Guacamole.Mouse = function Mouse(element) {
 
             // Repeatedly click the down button until insufficient delta remains
             do {
-                guac_mouse.click(Guacamole.Mouse.State.Buttons.DOWN);
+                guac_mouse.click(Mouse.State.Buttons.DOWN);
                 scroll_delta -= guac_mouse.scrollThreshold;
             } while (scroll_delta >= guac_mouse.scrollThreshold);
 
@@ -254,7 +255,7 @@ Guacamole.Mouse = function Mouse(element) {
         // whether the dispatched event is cancelled, as there is no Guacamole
         // scroll event and thus no way to cancel scroll events that are
         // smaller than required to produce an up/down click
-        Guacamole.Event.DOMEvent.cancelEvent(e);
+        Event.DOMEvent.cancelEvent(e);
 
     }
 
@@ -297,12 +298,12 @@ Guacamole.Mouse = function Mouse(element) {
     /**
      * Changes the local mouse cursor to the given canvas, having the given
      * hotspot coordinates. This affects styling of the element backing this
-     * Guacamole.Mouse only, and may fail depending on browser support for
+     * Mouse only, and may fail depending on browser support for
      * setting the mouse cursor.
      * 
      * If setting the local cursor is desired, it is up to the implementation
      * to do something else, such as use the software cursor built into
-     * Guacamole.Display, if the local cursor cannot be set.
+     * Display, if the local cursor cannot be set.
      *
      * @param {!HTMLCanvasElement} canvas
      *     The cursor image.
@@ -337,19 +338,19 @@ Guacamole.Mouse = function Mouse(element) {
  * The current state of a mouse, including position and buttons.
  *
  * @constructor
- * @augments Guacamole.Position
- * @param {Guacamole.Mouse.State|object} [template={}]
+ * @augments Position
+ * @param {Mouse.State|object} [template={}]
  *     The object whose properties should be copied within the new
- *     Guacamole.Mouse.State.
+ *     Mouse.State.
  */
-Guacamole.Mouse.State = function State(template) {
+Mouse.State = function State(template) {
 
     /**
      * Returns the template object that would be provided to the
-     * Guacamole.Mouse.State constructor to produce a new Guacamole.Mouse.State
+     * Mouse.State constructor to produce a new Mouse.State
      * object with the properties specified. The order and type of arguments
      * used by this function are identical to those accepted by the
-     * Guacamole.Mouse.State constructor of Apache Guacamole 1.3.0 and older.
+     * Mouse.State constructor of Apache Guacamole 1.3.0 and older.
      *
      * @private
      * @param {!number} x
@@ -377,7 +378,7 @@ Guacamole.Mouse.State = function State(template) {
      *
      * @return {!object}
      *     The equivalent template object that would be passed to the new
-     *     Guacamole.Mouse.State constructor.
+     *     Mouse.State constructor.
      */
     var legacyConstructor = function legacyConstructor(x, y, left, middle, right, up, down) {
         return {
@@ -397,7 +398,7 @@ Guacamole.Mouse.State = function State(template) {
     else
         template = template || {};
 
-    Guacamole.Position.call(this, template);
+    Position.call(this, template);
 
     /**
      * Whether the left mouse button is currently pressed.
@@ -447,15 +448,15 @@ Guacamole.Mouse.State = function State(template) {
 
 /**
  * All mouse buttons that may be represented by a
- * {@link Guacamole.Mouse.State}. 
+ * {@link Mouse.State}. 
  *
  * @readonly
  * @enum
  */
-Guacamole.Mouse.State.Buttons = {
+Mouse.State.Buttons = {
 
     /**
-     * The name of the {@link Guacamole.Mouse.State} property representing the
+     * The name of the {@link Mouse.State} property representing the
      * left mouse button.
      *
      * @constant
@@ -464,7 +465,7 @@ Guacamole.Mouse.State.Buttons = {
     LEFT : 'left',
 
     /**
-     * The name of the {@link Guacamole.Mouse.State} property representing the
+     * The name of the {@link Mouse.State} property representing the
      * middle mouse button.
      *
      * @constant
@@ -473,7 +474,7 @@ Guacamole.Mouse.State.Buttons = {
     MIDDLE : 'middle',
 
     /**
-     * The name of the {@link Guacamole.Mouse.State} property representing the
+     * The name of the {@link Mouse.State} property representing the
      * right mouse button.
      *
      * @constant
@@ -482,7 +483,7 @@ Guacamole.Mouse.State.Buttons = {
     RIGHT : 'right',
 
     /**
-     * The name of the {@link Guacamole.Mouse.State} property representing the
+     * The name of the {@link Mouse.State} property representing the
      * up mouse button (the fourth mouse button, clicked when the mouse scroll
      * wheel is scrolled up).
      *
@@ -492,7 +493,7 @@ Guacamole.Mouse.State.Buttons = {
     UP : 'up',
 
     /**
-     * The name of the {@link Guacamole.Mouse.State} property representing the
+     * The name of the {@link Mouse.State} property representing the
      * down mouse button (the fifth mouse button, clicked when the mouse scroll
      * wheel is scrolled up).
      *
@@ -505,27 +506,27 @@ Guacamole.Mouse.State.Buttons = {
 
 /**
  * Base event type for all mouse events. The mouse producing the event may be
- * the user's local mouse (as with {@link Guacamole.Mouse}) or an emulated
- * mouse (as with {@link Guacamole.Mouse.Touchpad}).
+ * the user's local mouse (as with {@link Mouse}) or an emulated
+ * mouse (as with {@link Mouse.Touchpad}).
  *
  * @constructor
- * @augments Guacamole.Event.DOMEvent
+ * @augments Event.DOMEvent
  * @param {!string} type
  *     The type name of the event ("mousedown", "mouseup", etc.)
  *
- * @param {!Guacamole.Mouse.State} state
+ * @param {!Mouse.State} state
  *     The current mouse state.
  *     
  * @param {Event|Event[]} [events=[]]
  *     The DOM events that are related to this event, if any.
  */
-Guacamole.Mouse.Event = function MouseEvent(type, state, events) {
+Mouse.Event = function MouseEvent(type, state, events) {
 
-    Guacamole.Event.DOMEvent.call(this, type, events);
+    Event.DOMEvent.call(this, type, events);
 
     /**
      * The name of the event handler used by the Guacamole JavaScript API for
-     * this event prior to the migration to Guacamole.Event.Target.
+     * this event prior to the migration to Event.Target.
      *
      * @private
      * @constant
@@ -536,7 +537,7 @@ Guacamole.Mouse.Event = function MouseEvent(type, state, events) {
     /**
      * The current mouse state at the time this event was fired.
      *
-     * @type {!Guacamole.Mouse.State}
+     * @type {!Mouse.State}
      */
     this.state = state;
 
@@ -557,71 +558,71 @@ Guacamole.Mouse.Event = function MouseEvent(type, state, events) {
 };
 
 /**
- * An object which can dispatch {@link Guacamole.Mouse.Event} objects
+ * An object which can dispatch {@link Mouse.Event} objects
  * representing mouse events. These mouse events may be produced from an actual
- * mouse device (as with {@link Guacamole.Mouse}), from an emulated mouse
- * device (as with {@link Guacamole.Mouse.Touchpad}, or may be programmatically
- * generated (using functions like [dispatch()]{@link Guacamole.Mouse.Event.Target#dispatch},
- * [press()]{@link Guacamole.Mouse.Event.Target#press}, and
- * [release()]{@link Guacamole.Mouse.Event.Target#release}).
+ * mouse device (as with {@link Mouse}), from an emulated mouse
+ * device (as with {@link Mouse.Touchpad}, or may be programmatically
+ * generated (using functions like [dispatch()]{@link Mouse.Event.Target#dispatch},
+ * [press()]{@link Mouse.Event.Target#press}, and
+ * [release()]{@link Mouse.Event.Target#release}).
  * 
  * @constructor
- * @augments Guacamole.Event.Target
+ * @augments Event.Target
  */
-Guacamole.Mouse.Event.Target = function MouseEventTarget() {
+Mouse.Event.Target = function MouseEventTarget() {
 
-    Guacamole.Event.Target.call(this);
+    Event.Target.call(this);
 
     /**
      * The current mouse state. The properties of this state are updated when
      * mouse events fire. This state object is also passed in as a parameter to
      * the handler of any mouse events.
      *
-     * @type {!Guacamole.Mouse.State}
+     * @type {!Mouse.State}
      */
-    this.currentState = new Guacamole.Mouse.State();
+    this.currentState = new Mouse.State();
 
     /**
      * Fired whenever a mouse button is effectively pressed. Depending on the
      * object dispatching the event, this can be due to a true mouse button
-     * press ({@link Guacamole.Mouse}), an emulated mouse button press from a
-     * touch gesture ({@link Guacamole.Mouse.Touchpad} and
-     * {@link Guacamole.Mouse.Touchscreen}), or may be programmatically
-     * generated through [dispatch()]{@link Guacamole.Mouse.Event.Target#dispatch},
-     * [press()]{@link Guacamole.Mouse.Event.Target#press}, or
-     * [click()]{@link Guacamole.Mouse.Event.Target#click}.
+     * press ({@link Mouse}), an emulated mouse button press from a
+     * touch gesture ({@link Mouse.Touchpad} and
+     * {@link Mouse.Touchscreen}), or may be programmatically
+     * generated through [dispatch()]{@link Mouse.Event.Target#dispatch},
+     * [press()]{@link Mouse.Event.Target#press}, or
+     * [click()]{@link Mouse.Event.Target#click}.
      *
-     * @event Guacamole.Mouse.Event.Target#mousedown
-     * @param {!Guacamole.Mouse.Event} event
+     * @event Mouse.Event.Target#mousedown
+     * @param {!Mouse.Event} event
      *     The mousedown event that was fired.
      */
 
     /**
      * Fired whenever a mouse button is effectively released. Depending on the
      * object dispatching the event, this can be due to a true mouse button
-     * release ({@link Guacamole.Mouse}), an emulated mouse button release from
-     * a touch gesture ({@link Guacamole.Mouse.Touchpad} and
-     * {@link Guacamole.Mouse.Touchscreen}), or may be programmatically
-     * generated through [dispatch()]{@link Guacamole.Mouse.Event.Target#dispatch},
-     * [release()]{@link Guacamole.Mouse.Event.Target#release}, or
-     * [click()]{@link Guacamole.Mouse.Event.Target#click}.
+     * release ({@link Mouse}), an emulated mouse button release from
+     * a touch gesture ({@link Mouse.Touchpad} and
+     * {@link Mouse.Touchscreen}), or may be programmatically
+     * generated through [dispatch()]{@link Mouse.Event.Target#dispatch},
+     * [release()]{@link Mouse.Event.Target#release}, or
+     * [click()]{@link Mouse.Event.Target#click}.
      *
-     * @event Guacamole.Mouse.Event.Target#mouseup
-     * @param {!Guacamole.Mouse.Event} event
+     * @event Mouse.Event.Target#mouseup
+     * @param {!Mouse.Event} event
      *     The mouseup event that was fired.
      */
 
     /**
      * Fired whenever the mouse pointer is effectively moved. Depending on the
      * object dispatching the event, this can be due to true mouse movement
-     * ({@link Guacamole.Mouse}), emulated mouse movement from
-     * a touch gesture ({@link Guacamole.Mouse.Touchpad} and
-     * {@link Guacamole.Mouse.Touchscreen}), or may be programmatically
-     * generated through [dispatch()]{@link Guacamole.Mouse.Event.Target#dispatch},
-     * or [move()]{@link Guacamole.Mouse.Event.Target#move}.
+     * ({@link Mouse}), emulated mouse movement from
+     * a touch gesture ({@link Mouse.Touchpad} and
+     * {@link Mouse.Touchscreen}), or may be programmatically
+     * generated through [dispatch()]{@link Mouse.Event.Target#dispatch},
+     * or [move()]{@link Mouse.Event.Target#move}.
      *
-     * @event Guacamole.Mouse.Event.Target#mousemove
-     * @param {!Guacamole.Mouse.Event} event
+     * @event Mouse.Event.Target#mousemove
+     * @param {!Mouse.Event} event
      *     The mousemove event that was fired.
      */
 
@@ -629,26 +630,26 @@ Guacamole.Mouse.Event.Target = function MouseEventTarget() {
      * Fired whenever the mouse pointer leaves the boundaries of the element
      * being monitored for interaction. This will only ever be automatically
      * fired due to movement of an actual mouse device via
-     * {@link Guacamole.Mouse} unless programmatically generated through
-     * [dispatch()]{@link Guacamole.Mouse.Event.Target#dispatch},
-     * or [out()]{@link Guacamole.Mouse.Event.Target#out}.
+     * {@link Mouse} unless programmatically generated through
+     * [dispatch()]{@link Mouse.Event.Target#dispatch},
+     * or [out()]{@link Mouse.Event.Target#out}.
      *
-     * @event Guacamole.Mouse.Event.Target#mouseout
-     * @param {!Guacamole.Mouse.Event} event
+     * @event Mouse.Event.Target#mouseout
+     * @param {!Mouse.Event} event
      *     The mouseout event that was fired.
      */
 
     /**
      * Presses the given mouse button, if it isn't already pressed. Valid
-     * button names are defined by {@link Guacamole.Mouse.State.Buttons} and
+     * button names are defined by {@link Mouse.State.Buttons} and
      * correspond to the button-related properties of
-     * {@link Guacamole.Mouse.State}.
+     * {@link Mouse.State}.
      *
-     * @fires Guacamole.Mouse.Event.Target#mousedown
+     * @fires Mouse.Event.Target#mousedown
      *
      * @param {!string} button
      *     The name of the mouse button to press, as defined by
-     *     {@link Guacamole.Mouse.State.Buttons}.
+     *     {@link Mouse.State.Buttons}.
      *
      * @param {Event|Event[]} [events=[]]
      *     The DOM events that are related to the mouse button press, if any.
@@ -656,21 +657,21 @@ Guacamole.Mouse.Event.Target = function MouseEventTarget() {
     this.press = function press(button, events) {
         if (!this.currentState[button]) {
             this.currentState[button] = true;
-            this.dispatch(new Guacamole.Mouse.Event('mousedown', this.currentState, events));
+            this.dispatch(new Mouse.Event('mousedown', this.currentState, events));
         }
     };
 
     /**
      * Releases the given mouse button, if it isn't already released. Valid
-     * button names are defined by {@link Guacamole.Mouse.State.Buttons} and
+     * button names are defined by {@link Mouse.State.Buttons} and
      * correspond to the button-related properties of
-     * {@link Guacamole.Mouse.State}.
+     * {@link Mouse.State}.
      *
-     * @fires Guacamole.Mouse.Event.Target#mouseup
+     * @fires Mouse.Event.Target#mouseup
      *
      * @param {!string} button
      *     The name of the mouse button to release, as defined by
-     *     {@link Guacamole.Mouse.State.Buttons}.
+     *     {@link Mouse.State.Buttons}.
      *
      * @param {Event|Event[]} [events=[]]
      *     The DOM events related to the mouse button release, if any.
@@ -678,22 +679,22 @@ Guacamole.Mouse.Event.Target = function MouseEventTarget() {
     this.release = function release(button, events) {
         if (this.currentState[button]) {
             this.currentState[button] = false;
-            this.dispatch(new Guacamole.Mouse.Event('mouseup', this.currentState, events));
+            this.dispatch(new Mouse.Event('mouseup', this.currentState, events));
         }
     };
 
     /**
      * Clicks (presses and releases) the given mouse button. Valid button
-     * names are defined by {@link Guacamole.Mouse.State.Buttons} and
+     * names are defined by {@link Mouse.State.Buttons} and
      * correspond to the button-related properties of
-     * {@link Guacamole.Mouse.State}.
+     * {@link Mouse.State}.
      *
-     * @fires Guacamole.Mouse.Event.Target#mousedown
-     * @fires Guacamole.Mouse.Event.Target#mouseup
+     * @fires Mouse.Event.Target#mousedown
+     * @fires Mouse.Event.Target#mouseup
      *
      * @param {!string} button
      *     The name of the mouse button to click, as defined by
-     *     {@link Guacamole.Mouse.State.Buttons}.
+     *     {@link Mouse.State.Buttons}.
      *
      * @param {Event|Event[]} [events=[]]
      *     The DOM events related to the click, if any.
@@ -706,11 +707,11 @@ Guacamole.Mouse.Event.Target = function MouseEventTarget() {
     /**
      * Moves the mouse to the given coordinates.
      *
-     * @fires Guacamole.Mouse.Event.Target#mousemove
+     * @fires Mouse.Event.Target#mousemove
      *
-     * @param {!(Guacamole.Position|object)} position
+     * @param {!(Position|object)} position
      *     The new coordinates of the mouse pointer. This object may be a
-     *     {@link Guacamole.Position} or any object with "x" and "y"
+     *     {@link Position} or any object with "x" and "y"
      *     properties.
      *
      * @param {Event|Event[]} [events=[]]
@@ -721,7 +722,7 @@ Guacamole.Mouse.Event.Target = function MouseEventTarget() {
         if (this.currentState.x !== position.x || this.currentState.y !== position.y) {
             this.currentState.x = position.x;
             this.currentState.y = position.y;
-            this.dispatch(new Guacamole.Mouse.Event('mousemove', this.currentState, events));
+            this.dispatch(new Mouse.Event('mousemove', this.currentState, events));
         }
 
     };
@@ -730,28 +731,28 @@ Guacamole.Mouse.Event.Target = function MouseEventTarget() {
      * Notifies event listeners that the mouse pointer has left the boundaries
      * of the area being monitored for mouse events.
      *
-     * @fires Guacamole.Mouse.Event.Target#mouseout
+     * @fires Mouse.Event.Target#mouseout
      *
      * @param {Event|Event[]} [events=[]]
      *     The DOM events related to the mouse leaving the boundaries of the
      *     monitored object, if any.
      */
     this.out = function out(events) {
-        this.dispatch(new Guacamole.Mouse.Event('mouseout', this.currentState, events));
+        this.dispatch(new Mouse.Event('mouseout', this.currentState, events));
     };
 
     /**
      * Releases all mouse buttons that are currently pressed. If all mouse
      * buttons have already been released, this function has no effect.
      *
-     * @fires Guacamole.Mouse.Event.Target#mouseup
+     * @fires Mouse.Event.Target#mouseup
      *
      * @param {Event|Event[]} [events=[]]
      *     The DOM event related to all mouse buttons being released, if any.
      */
     this.reset = function reset(events) {
-        for (var button in Guacamole.Mouse.State.Buttons) {
-            this.release(Guacamole.Mouse.State.Buttons[button], events);
+        for (var button in Mouse.State.Buttons) {
+            this.release(Mouse.State.Buttons[button], events);
         }
     };
 
@@ -764,7 +765,7 @@ Guacamole.Mouse.Event.Target = function MouseEventTarget() {
  * on a touchpad (drag to push the mouse pointer, tap to click).
  * 
  * @example
- * var touchpad = new Guacamole.Mouse.Touchpad(client.getDisplay().getElement());
+ * var touchpad = new Mouse.Touchpad(client.getDisplay().getElement());
  *
  * // Emulate a mouse using touchpad-style gestures, forwarding all mouse
  * // interaction over Guacamole connection
@@ -780,26 +781,26 @@ Guacamole.Mouse.Event.Target = function MouseEventTarget() {
  * });
  *
  * @constructor
- * @augments Guacamole.Mouse.Event.Target
+ * @augments Mouse.Event.Target
  * @param {!Element} element
  *     The Element to use to provide touch events.
  */
-Guacamole.Mouse.Touchpad = function Touchpad(element) {
+Mouse.Touchpad = function Touchpad(element) {
 
-    Guacamole.Mouse.Event.Target.call(this);
+    Mouse.Event.Target.call(this);
 
     /**
-     * The "mouseout" event will never be fired by Guacamole.Mouse.Touchpad.
+     * The "mouseout" event will never be fired by Mouse.Touchpad.
      *
      * @ignore
-     * @event Guacamole.Mouse.Touchpad#mouseout
+     * @event Mouse.Touchpad#mouseout
      */
 
     /**
-     * Reference to this Guacamole.Mouse.Touchpad.
+     * Reference to this Mouse.Touchpad.
      *
      * @private
-     * @type {!Guacamole.Mouse.Touchpad}
+     * @type {!Mouse.Touchpad}
      */
     var guac_touchpad = this;
 
@@ -832,9 +833,9 @@ Guacamole.Mouse.Touchpad = function Touchpad(element) {
      * mouse events fire. This state object is also passed in as a parameter to
      * the handler of any mouse events.
      * 
-     * @type {!Guacamole.Mouse.State}
+     * @type {!Mouse.State}
      */
-    this.currentState = new Guacamole.Mouse.State();
+    this.currentState = new Mouse.State();
 
     var touch_count = 0;
     var last_touch_x = 0;
@@ -959,7 +960,7 @@ Guacamole.Mouse.Touchpad = function Touchpad(element) {
             var scale = 1 + velocity;
 
             // Update mouse location
-            var position = new Guacamole.Position(guac_touchpad.currentState);
+            var position = new Position(guac_touchpad.currentState);
             position.x += delta_x*scale;
             position.y += delta_y*scale;
 
@@ -1010,7 +1011,7 @@ Guacamole.Mouse.Touchpad = function Touchpad(element) {
  * long-press to right-click).
  *
  * @example
- * var touchscreen = new Guacamole.Mouse.Touchscreen(client.getDisplay().getElement());
+ * var touchscreen = new Mouse.Touchscreen(client.getDisplay().getElement());
  *
  * // Emulate a mouse using touchscreen-style gestures, forwarding all mouse
  * // interaction over Guacamole connection
@@ -1026,26 +1027,26 @@ Guacamole.Mouse.Touchpad = function Touchpad(element) {
  * });
  *
  * @constructor
- * @augments Guacamole.Mouse.Event.Target
+ * @augments Mouse.Event.Target
  * @param {!Element} element
  *     The Element to use to provide touch events.
  */
-Guacamole.Mouse.Touchscreen = function Touchscreen(element) {
+Mouse.Touchscreen = function Touchscreen(element) {
 
-    Guacamole.Mouse.Event.Target.call(this);
+    Mouse.Event.Target.call(this);
 
     /**
-     * The "mouseout" event will never be fired by Guacamole.Mouse.Touchscreen.
+     * The "mouseout" event will never be fired by Mouse.Touchscreen.
      *
      * @ignore
-     * @event Guacamole.Mouse.Touchscreen#mouseout
+     * @event Mouse.Touchscreen#mouseout
      */
 
     /**
-     * Reference to this Guacamole.Mouse.Touchscreen.
+     * Reference to this Mouse.Touchscreen.
      *
      * @private
-     * @type {!Guacamole.Mouse.Touchscreen}
+     * @type {!Mouse.Touchscreen}
      */
     var guac_touchscreen = this;
 
@@ -1181,7 +1182,7 @@ Guacamole.Mouse.Touchscreen = function Touchscreen(element) {
         window.clearTimeout(long_press_timeout);
 
         // Always release mouse button if pressed
-        guac_touchscreen.release(Guacamole.Mouse.State.Buttons.LEFT, e);
+        guac_touchscreen.release(Mouse.State.Buttons.LEFT, e);
 
         // If finger hasn't moved enough to cancel the click
         if (!finger_moved(e)) {
@@ -1192,12 +1193,12 @@ Guacamole.Mouse.Touchscreen = function Touchscreen(element) {
             if (!guac_touchscreen.currentState.left) {
 
                 var touch = e.changedTouches[0];
-                guac_touchscreen.move(Guacamole.Position.fromClientPosition(element, touch.clientX, touch.clientY));
-                guac_touchscreen.press(Guacamole.Mouse.State.Buttons.LEFT, e);
+                guac_touchscreen.move(Position.fromClientPosition(element, touch.clientX, touch.clientY));
+                guac_touchscreen.press(Mouse.State.Buttons.LEFT, e);
 
                 // Release button after a delay, if not canceled
                 click_release_timeout = window.setTimeout(function() {
-                    guac_touchscreen.release(Guacamole.Mouse.State.Buttons.LEFT, e);
+                    guac_touchscreen.release(Mouse.State.Buttons.LEFT, e);
                     end_gesture();
                 }, guac_touchscreen.clickTimingThreshold);
 
@@ -1226,8 +1227,8 @@ Guacamole.Mouse.Touchscreen = function Touchscreen(element) {
         // Click right button if this turns into a long-press
         long_press_timeout = window.setTimeout(function() {
             var touch = e.touches[0];
-            guac_touchscreen.move(Guacamole.Position.fromClientPosition(element, touch.clientX, touch.clientY));
-            guac_touchscreen.click(Guacamole.Mouse.State.Buttons.RIGHT, e);
+            guac_touchscreen.move(Position.fromClientPosition(element, touch.clientX, touch.clientY));
+            guac_touchscreen.click(Mouse.State.Buttons.RIGHT, e);
             end_gesture();
         }, guac_touchscreen.longPressThreshold);
 
@@ -1256,10 +1257,12 @@ Guacamole.Mouse.Touchscreen = function Touchscreen(element) {
 
             // Update state
             var touch = e.touches[0];
-            guac_touchscreen.move(Guacamole.Position.fromClientPosition(element, touch.clientX, touch.clientY), e);
+            guac_touchscreen.move(Position.fromClientPosition(element, touch.clientX, touch.clientY), e);
 
         }
 
     }, false);
 
 };
+
+export default Mouse;

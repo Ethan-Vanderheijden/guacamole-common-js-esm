@@ -17,21 +17,19 @@
  * under the License.
  */
 
-var Guacamole = Guacamole || {};
-
 /**
  * A reader which automatically handles the given input stream, returning
  * strictly received packets as array buffers. Note that this object will
- * overwrite any installed event handlers on the given Guacamole.InputStream.
+ * overwrite any installed event handlers on the given InputStream.
  * 
  * @constructor
- * @param {!Guacamole.InputStream} stream
+ * @param {!InputStream} stream
  *     The stream that data will be read from.
  */
-Guacamole.ArrayBufferReader = function(stream) {
+export default function ArrayBufferReader(stream) {
 
     /**
-     * Reference to this Guacamole.InputStream.
+     * Reference to this InputStream.
      * @private
      */
     var guac_reader = this;

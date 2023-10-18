@@ -17,8 +17,6 @@
  * under the License.
  */
 
-var Guacamole = Guacamole || {};
-
 /**
  * Provides cross-browser and cross-keyboard keyboard for a specific element.
  * Browser and keyboard layout variation is abstracted away, providing events
@@ -28,30 +26,30 @@ var Guacamole = Guacamole || {};
  * @param {Element|Document} [element]
  *    The Element to use to provide keyboard events. If omitted, at least one
  *    Element must be manually provided through the listenTo() function for
- *    the Guacamole.Keyboard instance to have any effect.
+ *    the Keyboard instance to have any effect.
  */
-Guacamole.Keyboard = function Keyboard(element) {
+function Keyboard(element) {
 
     /**
-     * Reference to this Guacamole.Keyboard.
+     * Reference to this Keyboard.
      *
      * @private
-     * @type {!Guacamole.Keyboard}
+     * @type {!Keyboard}
      */
     var guac_keyboard = this;
 
     /**
-     * An integer value which uniquely identifies this Guacamole.Keyboard
-     * instance with respect to other Guacamole.Keyboard instances.
+     * An integer value which uniquely identifies this Keyboard
+     * instance with respect to other Keyboard instances.
      *
      * @private
      * @type {!number}
      */
-    var guacKeyboardID = Guacamole.Keyboard._nextID++;
+    var guacKeyboardID = Keyboard._nextID++;
 
     /**
      * The name of the property which is added to event objects via markEvent()
-     * to note that they have already been handled by this Guacamole.Keyboard.
+     * to note that they have already been handled by this Keyboard.
      *
      * @private
      * @constant
@@ -61,7 +59,7 @@ Guacamole.Keyboard = function Keyboard(element) {
 
     /**
      * Fired whenever the user presses a key with the element associated
-     * with this Guacamole.Keyboard in focus.
+     * with this Keyboard in focus.
      * 
      * @event
      * @param {!number} keysym
@@ -75,7 +73,7 @@ Guacamole.Keyboard = function Keyboard(element) {
 
     /**
      * Fired whenever the user releases a key with the element associated
-     * with this Guacamole.Keyboard in focus.
+     * with this Keyboard in focus.
      * 
      * @event
      * @param {!number} keysym
@@ -195,9 +193,9 @@ Guacamole.Keyboard = function Keyboard(element) {
          * The state of all local keyboard modifiers at the time this event was
          * received.
          *
-         * @type {!Guacamole.Keyboard.ModifierState}
+         * @type {!Keyboard.ModifierState}
          */
-        this.modifiers = orig ? Guacamole.Keyboard.ModifierState.fromKeyboardEvent(orig) : new Guacamole.Keyboard.ModifierState();
+        this.modifiers = orig ? Keyboard.ModifierState.fromKeyboardEvent(orig) : new Keyboard.ModifierState();
 
         /**
          * An arbitrary timestamp in milliseconds, indicating this event's
@@ -253,7 +251,7 @@ Guacamole.Keyboard = function Keyboard(element) {
      *
      * @private
      * @constructor
-     * @augments Guacamole.Keyboard.KeyEvent
+     * @augments Keyboard.KeyEvent
      * @param {!KeyboardEvent} orig
      *     The relevant DOM "keydown" event.
      */
@@ -324,7 +322,7 @@ Guacamole.Keyboard = function Keyboard(element) {
      *
      * @private
      * @constructor
-     * @augments Guacamole.Keyboard.KeyEvent
+     * @augments Keyboard.KeyEvent
      * @param {!KeyboardEvent} orig
      *     The relevant DOM "keypress" event.
      */
@@ -350,7 +348,7 @@ Guacamole.Keyboard = function Keyboard(element) {
      *
      * @private
      * @constructor
-     * @augments Guacamole.Keyboard.KeyEvent
+     * @augments Keyboard.KeyEvent
      * @param {!KeyboardEvent} orig
      *     The relevant DOM "keyup" event.
      */
@@ -591,9 +589,9 @@ Guacamole.Keyboard = function Keyboard(element) {
     /**
      * All modifiers and their states.
      *
-     * @type {!Guacamole.Keyboard.ModifierState}
+     * @type {!Keyboard.ModifierState}
      */
-    this.modifiers = new Guacamole.Keyboard.ModifierState();
+    this.modifiers = new Keyboard.ModifierState();
         
     /**
      * The state of every key, indexed by keysym. If a particular key is
@@ -923,7 +921,7 @@ Guacamole.Keyboard = function Keyboard(element) {
      *
      * @private
      * @param {!string} modifier
-     *     The name of the {@link Guacamole.Keyboard.ModifierState} property
+     *     The name of the {@link Keyboard.ModifierState} property
      *     being updated.
      *
      * @param {!number[]} keysyms
@@ -1273,7 +1271,7 @@ Guacamole.Keyboard = function Keyboard(element) {
 
     /**
      * Attempts to mark the given Event as having been handled by this
-     * Guacamole.Keyboard. If the Event has already been marked as handled,
+     * Keyboard. If the Event has already been marked as handled,
      * false is returned.
      *
      * @param {!Event} e
@@ -1298,7 +1296,7 @@ Guacamole.Keyboard = function Keyboard(element) {
     /**
      * Attaches event listeners to the given Element, automatically translating
      * received key, input, and composition events into simple keydown/keyup
-     * events signalled through this Guacamole.Keyboard's onkeydown and
+     * events signalled through this Keyboard's onkeydown and
      * onkeyup handlers.
      *
      * @param {!(Element|Document)} element
@@ -1442,19 +1440,19 @@ Guacamole.Keyboard = function Keyboard(element) {
 };
 
 /**
- * The unique numerical identifier to assign to the next Guacamole.Keyboard
+ * The unique numerical identifier to assign to the next Keyboard
  * instance.
  *
  * @private
  * @type {!number}
  */
-Guacamole.Keyboard._nextID = 0;
+Keyboard._nextID = 0;
 
 /**
  * The state of all supported keyboard modifiers.
  * @constructor
  */
-Guacamole.Keyboard.ModifierState = function() {
+Keyboard.ModifierState = function() {
     
     /**
      * Whether shift is currently pressed.
@@ -1499,12 +1497,12 @@ Guacamole.Keyboard.ModifierState = function() {
  * @param {!KeyboardEvent} e
  *     The keyboard event to read.
  *
- * @returns {!Guacamole.Keyboard.ModifierState}
+ * @returns {!Keyboard.ModifierState}
  *     The current state of keyboard modifiers.
  */
-Guacamole.Keyboard.ModifierState.fromKeyboardEvent = function(e) {
+Keyboard.ModifierState.fromKeyboardEvent = function(e) {
     
-    var state = new Guacamole.Keyboard.ModifierState();
+    var state = new Keyboard.ModifierState();
 
     // Assign states from old flags
     state.shift = e.shiftKey;
@@ -1523,3 +1521,5 @@ Guacamole.Keyboard.ModifierState.fromKeyboardEvent = function(e) {
     return state;
     
 };
+
+export default Keyboard;

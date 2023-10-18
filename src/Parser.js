@@ -17,21 +17,19 @@
  * under the License.
  */
 
-var Guacamole = Guacamole || {};
-
 /**
  * Simple Guacamole protocol parser that invokes an oninstruction event when
  * full instructions are available from data received via receive().
  *
  * @constructor
  */
-Guacamole.Parser = function Parser() {
+function Parser() {
 
     /**
      * Reference to this parser.
      *
      * @private
-     * @type {!Guacamole.Parser}
+     * @type {!Parser}
      */
     var parser = this;
 
@@ -110,7 +108,7 @@ Guacamole.Parser = function Parser() {
 
     /**
      * Appends the given instruction data packet to the internal buffer of
-     * this Guacamole.Parser, executing all completed instructions at
+     * this Parser, executing all completed instructions at
      * the beginning of this buffer, if any.
      *
      * @param {!string} packet
@@ -170,7 +168,7 @@ Guacamole.Parser = function Parser() {
                 // the declared length is simply the difference between the
                 // number of codepoints actually present vs. the expected
                 // length.
-                var codepoints = Guacamole.Parser.codePointCount(buffer, startIndex, elementEnd);
+                var codepoints = Parser.codePointCount(buffer, startIndex, elementEnd);
                 if (codepoints < elementCodepoints) {
                     elementEnd += elementCodepoints - codepoints;
                     continue;
@@ -290,7 +288,7 @@ Guacamole.Parser = function Parser() {
  *     The number of Unicode codepoints within the requested portion of the
  *     given string.
  */
-Guacamole.Parser.codePointCount = function codePointCount(str, start, end) {
+Parser.codePointCount = function codePointCount(str, start, end) {
 
     // Count only characters within the specified region
     str = str.substring(start || 0, end);
@@ -321,7 +319,7 @@ Guacamole.Parser.codePointCount = function codePointCount(str, start, end) {
  *     A complete Guacamole instruction consisting of each of the provided
  *     element values, in order.
  */
-Guacamole.Parser.toInstruction = function toInstruction(elements) {
+Parser.toInstruction = function toInstruction(elements) {
 
     /**
      * Converts the given value to a length/string pair for use as an
@@ -336,7 +334,7 @@ Guacamole.Parser.toInstruction = function toInstruction(elements) {
      */
     var toElement = function toElement(value) {
         var str = '' + value;
-        return Guacamole.Parser.codePointCount(str) + "." + str;
+        return Parser.codePointCount(str) + "." + str;
     };
 
     var instr = toElement(elements[0]);
@@ -346,3 +344,5 @@ Guacamole.Parser.toInstruction = function toInstruction(elements) {
     return instr + ';';
 
 };
+
+export default Parser;

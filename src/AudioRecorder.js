@@ -17,23 +17,26 @@
  * under the License.
  */
 
-var Guacamole = Guacamole || {};
+import ArrayBufferWriter from './ArrayBufferWriter.js';
+import AudioContextFactory from './AudioContextFactory.js';
+import Status from './Status.js';
+import RawAudioFormat from './RawAudioFormat.js';
 
 /**
  * Abstract audio recorder which streams arbitrary audio data to an underlying
- * Guacamole.OutputStream. It is up to implementations of this class to provide
- * some means of handling this Guacamole.OutputStream. Data produced by the
+ * OutputStream. It is up to implementations of this class to provide
+ * some means of handling this OutputStream. Data produced by the
  * recorder is to be sent along the provided stream immediately.
  *
  * @constructor
  */
-Guacamole.AudioRecorder = function AudioRecorder() {
+function AudioRecorder() {
 
     /**
      * Callback which is invoked when the audio recording process has stopped
      * and the underlying Guacamole stream has been closed normally. Audio will
-     * only resume recording if a new Guacamole.AudioRecorder is started. This
-     * Guacamole.AudioRecorder instance MAY NOT be reused.
+     * only resume recording if a new AudioRecorder is started. This
+     * AudioRecorder instance MAY NOT be reused.
      *
      * @event
      */
@@ -43,7 +46,7 @@ Guacamole.AudioRecorder = function AudioRecorder() {
      * Callback which is invoked when the audio recording process cannot
      * continue due to an error, if it has started at all. The underlying
      * Guacamole stream is automatically closed. Future attempts to record
-     * audio should not be made, and this Guacamole.AudioRecorder instance
+     * audio should not be made, and this AudioRecorder instance
      * MAY NOT be reused.
      *
      * @event
@@ -54,25 +57,25 @@ Guacamole.AudioRecorder = function AudioRecorder() {
 
 /**
  * Determines whether the given mimetype is supported by any built-in
- * implementation of Guacamole.AudioRecorder, and thus will be properly handled
- * by Guacamole.AudioRecorder.getInstance().
+ * implementation of AudioRecorder, and thus will be properly handled
+ * by AudioRecorder.getInstance().
  *
  * @param {!string} mimetype
  *     The mimetype to check.
  *
  * @returns {!boolean}
  *     true if the given mimetype is supported by any built-in
- *     Guacamole.AudioRecorder, false otherwise.
+ *     AudioRecorder, false otherwise.
  */
-Guacamole.AudioRecorder.isSupportedType = function isSupportedType(mimetype) {
+AudioRecorder.isSupportedType = function isSupportedType(mimetype) {
 
-    return Guacamole.RawAudioRecorder.isSupportedType(mimetype);
+    return RawAudioRecorder.isSupportedType(mimetype);
 
 };
 
 /**
  * Returns a list of all mimetypes supported by any built-in
- * Guacamole.AudioRecorder, in rough order of priority. Beware that only the
+ * AudioRecorder, in rough order of priority. Beware that only the
  * core mimetypes themselves will be listed. Any mimetype parameters, even
  * required ones, will not be included in the list. For example, "audio/L8" is
  * a supported raw audio mimetype that is supported, but it is invalid without
@@ -81,35 +84,35 @@ Guacamole.AudioRecorder.isSupportedType = function isSupportedType(mimetype) {
  *
  * @returns {!string[]}
  *     A list of all mimetypes supported by any built-in
- *     Guacamole.AudioRecorder, excluding any parameters.
+ *     AudioRecorder, excluding any parameters.
  */
-Guacamole.AudioRecorder.getSupportedTypes = function getSupportedTypes() {
+AudioRecorder.getSupportedTypes = function getSupportedTypes() {
 
-    return Guacamole.RawAudioRecorder.getSupportedTypes();
+    return RawAudioRecorder.getSupportedTypes();
 
 };
 
 /**
- * Returns an instance of Guacamole.AudioRecorder providing support for the
+ * Returns an instance of AudioRecorder providing support for the
  * given audio format. If support for the given audio format is not available,
  * null is returned.
  *
- * @param {!Guacamole.OutputStream} stream
- *     The Guacamole.OutputStream to send audio data through.
+ * @param {!OutputStream} stream
+ *     The OutputStream to send audio data through.
  *
  * @param {!string} mimetype
  *     The mimetype of the audio data to be sent along the provided stream.
  *
- * @return {Guacamole.AudioRecorder}
- *     A Guacamole.AudioRecorder instance supporting the given mimetype and
+ * @return {AudioRecorder}
+ *     A AudioRecorder instance supporting the given mimetype and
  *     writing to the given stream, or null if support for the given mimetype
  *     is absent.
  */
-Guacamole.AudioRecorder.getInstance = function getInstance(stream, mimetype) {
+AudioRecorder.getInstance = function getInstance(stream, mimetype) {
 
     // Use raw audio recorder if possible
-    if (Guacamole.RawAudioRecorder.isSupportedType(mimetype))
-        return new Guacamole.RawAudioRecorder(stream, mimetype);
+    if (RawAudioRecorder.isSupportedType(mimetype))
+        return new RawAudioRecorder(stream, mimetype);
 
     // No support for given mimetype
     return null;
@@ -117,27 +120,27 @@ Guacamole.AudioRecorder.getInstance = function getInstance(stream, mimetype) {
 };
 
 /**
- * Implementation of Guacamole.AudioRecorder providing support for raw PCM
+ * Implementation of AudioRecorder providing support for raw PCM
  * format audio. This recorder relies only on the Web Audio API and does not
  * require any browser-level support for its audio formats.
  *
  * @constructor
- * @augments Guacamole.AudioRecorder
- * @param {!Guacamole.OutputStream} stream
- *     The Guacamole.OutputStream to write audio data to.
+ * @augments AudioRecorder
+ * @param {!OutputStream} stream
+ *     The OutputStream to write audio data to.
  *
  * @param {!string} mimetype
  *     The mimetype of the audio data to send along the provided stream, which
  *     must be a "audio/L8" or "audio/L16" mimetype with necessary parameters,
  *     such as: "audio/L16;rate=44100,channels=2".
  */
-Guacamole.RawAudioRecorder = function RawAudioRecorder(stream, mimetype) {
+function RawAudioRecorder(stream, mimetype) {
 
     /**
      * Reference to this RawAudioRecorder.
      *
      * @private
-     * @type {!Guacamole.RawAudioRecorder}
+     * @type {!RawAudioRecorder}
      */
     var recorder = this;
 
@@ -168,9 +171,9 @@ Guacamole.RawAudioRecorder = function RawAudioRecorder(stream, mimetype) {
      * The format of audio this recorder will encode.
      *
      * @private
-     * @type {Guacamole.RawAudioFormat}
+     * @type {RawAudioFormat}
      */
-    var format = Guacamole.RawAudioFormat.parse(mimetype);
+    var format = RawAudioFormat.parse(mimetype);
 
     /**
      * An instance of a Web Audio API AudioContext object, or null if the
@@ -179,7 +182,7 @@ Guacamole.RawAudioRecorder = function RawAudioRecorder(stream, mimetype) {
      * @private
      * @type {AudioContext}
      */
-    var context = Guacamole.AudioContextFactory.getAudioContext();
+    var context = AudioContextFactory.getAudioContext();
 
     // Some browsers do not implement navigator.mediaDevices - this
     // shims in this functionality to ensure code compatibility.
@@ -197,13 +200,13 @@ Guacamole.RawAudioRecorder = function RawAudioRecorder(stream, mimetype) {
                 || navigator.msGetUserMedia).bind(navigator);
 
     /**
-     * Guacamole.ArrayBufferWriter wrapped around the audio output stream
-     * provided when this Guacamole.RawAudioRecorder was created.
+     * ArrayBufferWriter wrapped around the audio output stream
+     * provided when this RawAudioRecorder was created.
      *
      * @private
-     * @type {!Guacamole.ArrayBufferWriter}
+     * @type {!ArrayBufferWriter}
      */
-    var writer = new Guacamole.ArrayBufferWriter(stream);
+    var writer = new ArrayBufferWriter(stream);
 
     /**
      * The type of typed array that will be used to represent each audio packet
@@ -467,9 +470,9 @@ Guacamole.RawAudioRecorder = function RawAudioRecorder(stream, mimetype) {
     /**
      * Requests access to the user's microphone and begins capturing audio. All
      * received audio data is resampled as necessary and forwarded to the
-     * Guacamole stream underlying this Guacamole.RawAudioRecorder. This
+     * Guacamole stream underlying this RawAudioRecorder. This
      * function must be invoked ONLY ONCE per instance of
-     * Guacamole.RawAudioRecorder.
+     * RawAudioRecorder.
      *
      * @private
      */
@@ -525,7 +528,7 @@ Guacamole.RawAudioRecorder = function RawAudioRecorder(stream, mimetype) {
     writer.onack = function audioStreamAcknowledged(status) {
 
         // Begin capture if successful response and not yet started
-        if (status.code === Guacamole.Status.Code.SUCCESS && !mediaStream)
+        if (status.code === Status.Code.SUCCESS && !mediaStream)
             beginAudioCapture();
 
         // Otherwise stop capture and cease handling any further acks
@@ -536,7 +539,7 @@ Guacamole.RawAudioRecorder = function RawAudioRecorder(stream, mimetype) {
             writer.onack = null;
 
             // Notify if stream has closed normally
-            if (status.code === Guacamole.Status.Code.RESOURCE_CLOSED) {
+            if (status.code === Status.Code.RESOURCE_CLOSED) {
                 if (recorder.onclose)
                     recorder.onclose();
             }
@@ -553,31 +556,31 @@ Guacamole.RawAudioRecorder = function RawAudioRecorder(stream, mimetype) {
 
 };
 
-Guacamole.RawAudioRecorder.prototype = new Guacamole.AudioRecorder();
+RawAudioRecorder.prototype = new AudioRecorder();
 
 /**
  * Determines whether the given mimetype is supported by
- * Guacamole.RawAudioRecorder.
+ * RawAudioRecorder.
  *
  * @param {!string} mimetype
  *     The mimetype to check.
  *
  * @returns {!boolean}
- *     true if the given mimetype is supported by Guacamole.RawAudioRecorder,
+ *     true if the given mimetype is supported by RawAudioRecorder,
  *     false otherwise.
  */
-Guacamole.RawAudioRecorder.isSupportedType = function isSupportedType(mimetype) {
+RawAudioRecorder.isSupportedType = function isSupportedType(mimetype) {
 
     // No supported types if no Web Audio API
-    if (!Guacamole.AudioContextFactory.getAudioContext())
+    if (!AudioContextFactory.getAudioContext())
         return false;
 
-    return Guacamole.RawAudioFormat.parse(mimetype) !== null;
+    return RawAudioFormat.parse(mimetype) !== null;
 
 };
 
 /**
- * Returns a list of all mimetypes supported by Guacamole.RawAudioRecorder. Only
+ * Returns a list of all mimetypes supported by RawAudioRecorder. Only
  * the core mimetypes themselves will be listed. Any mimetype parameters, even
  * required ones, will not be included in the list. For example, "audio/L8" is
  * a raw audio mimetype that may be supported, but it is invalid without
@@ -585,14 +588,14 @@ Guacamole.RawAudioRecorder.isSupportedType = function isSupportedType(mimetype) 
  * however (see https://tools.ietf.org/html/rfc4856).
  *
  * @returns {!string[]}
- *     A list of all mimetypes supported by Guacamole.RawAudioRecorder,
+ *     A list of all mimetypes supported by RawAudioRecorder,
  *     excluding any parameters. If the necessary JavaScript APIs for recording
  *     raw audio are absent, this list will be empty.
  */
-Guacamole.RawAudioRecorder.getSupportedTypes = function getSupportedTypes() {
+RawAudioRecorder.getSupportedTypes = function getSupportedTypes() {
 
     // No supported types if no Web Audio API
-    if (!Guacamole.AudioContextFactory.getAudioContext())
+    if (!AudioContextFactory.getAudioContext())
         return [];
 
     // We support 8-bit and 16-bit raw PCM
@@ -602,3 +605,7 @@ Guacamole.RawAudioRecorder.getSupportedTypes = function getSupportedTypes() {
     ];
 
 };
+
+export {
+    AudioRecorder as default,
+}

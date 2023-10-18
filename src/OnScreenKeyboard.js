@@ -17,24 +17,22 @@
  * under the License.
  */
 
-var Guacamole = Guacamole || {};
-
 /**
  * Dynamic on-screen keyboard. Given the layout object for an on-screen
  * keyboard, this object will construct a clickable on-screen keyboard with its
  * own key events.
  *
  * @constructor
- * @param {!Guacamole.OnScreenKeyboard.Layout} layout
+ * @param {!OnScreenKeyboard.Layout} layout
  *     The layout of the on-screen keyboard to display.
  */
-Guacamole.OnScreenKeyboard = function(layout) {
+function OnScreenKeyboard(layout) {
 
     /**
-     * Reference to this Guacamole.OnScreenKeyboard.
+     * Reference to this OnScreenKeyboard.
      *
      * @private
-     * @type {!Guacamole.OnScreenKeyboard}
+     * @type {!OnScreenKeyboard}
      */
     var osk = this;
 
@@ -246,7 +244,7 @@ Guacamole.OnScreenKeyboard = function(layout) {
      * @param {!string} keyName
      *     The name of the key to retrieve.
      *
-     * @returns {Guacamole.OnScreenKeyboard.Key}
+     * @returns {OnScreenKeyboard.Key}
      *     The Key object associated with the given name, where that object's
      *     requirements are all currently satisfied, or null if no such Key
      *     can be found.
@@ -404,7 +402,7 @@ Guacamole.OnScreenKeyboard = function(layout) {
     this.touchMouseThreshold = 3;
 
     /**
-     * Fired whenever the user presses a key on this Guacamole.OnScreenKeyboard.
+     * Fired whenever the user presses a key on this OnScreenKeyboard.
      * 
      * @event
      * @param {!number} keysym
@@ -413,7 +411,7 @@ Guacamole.OnScreenKeyboard = function(layout) {
     this.onkeydown = null;
 
     /**
-     * Fired whenever the user releases a key on this Guacamole.OnScreenKeyboard.
+     * Fired whenever the user releases a key on this OnScreenKeyboard.
      * 
      * @event
      * @param {!number} keysym
@@ -424,9 +422,9 @@ Guacamole.OnScreenKeyboard = function(layout) {
     /**
      * The keyboard layout provided at time of construction.
      *
-     * @type {!Guacamole.OnScreenKeyboard.Layout}
+     * @type {!OnScreenKeyboard.Layout}
      */
-    this.layout = new Guacamole.OnScreenKeyboard.Layout(layout);
+    this.layout = new OnScreenKeyboard.Layout(layout);
 
     /**
      * Returns the element containing the entire on-screen keyboard.
@@ -439,12 +437,12 @@ Guacamole.OnScreenKeyboard = function(layout) {
     };
 
     /**
-     * Resizes all elements within this Guacamole.OnScreenKeyboard such that
+     * Resizes all elements within this OnScreenKeyboard such that
      * the width is close to but does not exceed the specified width. The
      * height of the keyboard is determined based on the width.
      * 
      * @param {!number} width
-     *     The width to resize this Guacamole.OnScreenKeyboard to, in pixels.
+     *     The width to resize this OnScreenKeyboard to, in pixels.
      */
     this.resize = function(width) {
 
@@ -469,12 +467,12 @@ Guacamole.OnScreenKeyboard = function(layout) {
      * @param {!string} name
      *     The name of the key being coerced into an array of Key objects.
      *
-     * @param {!(number|string|Guacamole.OnScreenKeyboard.Key|Guacamole.OnScreenKeyboard.Key[])} object
+     * @param {!(number|string|OnScreenKeyboard.Key|OnScreenKeyboard.Key[])} object
      *     The object defining the behavior of the key having the given name,
      *     which may be the title of the key (a string), the keysym (a number),
      *     a single Key object, or an array of Key objects.
      *     
-     * @returns {!Guacamole.OnScreenKeyboard.Key[]}
+     * @returns {!OnScreenKeyboard.Key[]}
      *     An array of all keys associated with the given name.
      */
     var asKeyArray = function asKeyArray(name, object) {
@@ -483,14 +481,14 @@ Guacamole.OnScreenKeyboard = function(layout) {
         if (object instanceof Array) {
             var keys = [];
             for (var i=0; i < object.length; i++) {
-                keys.push(new Guacamole.OnScreenKeyboard.Key(object[i], name));
+                keys.push(new OnScreenKeyboard.Key(object[i], name));
             }
             return keys;
         }
 
         // Derive key object from keysym if that's all we have
         if (typeof object === 'number') {
-            return [new Guacamole.OnScreenKeyboard.Key({
+            return [new OnScreenKeyboard.Key({
                 name   : name,
                 keysym : object
             })];
@@ -498,30 +496,30 @@ Guacamole.OnScreenKeyboard = function(layout) {
 
         // Derive key object from title if that's all we have
         if (typeof object === 'string') {
-            return [new Guacamole.OnScreenKeyboard.Key({
+            return [new OnScreenKeyboard.Key({
                 name  : name,
                 title : object
             })];
         }
 
         // Otherwise, assume it's already a key object, just not an array
-        return [new Guacamole.OnScreenKeyboard.Key(object, name)];
+        return [new OnScreenKeyboard.Key(object, name)];
 
     };
 
     /**
      * Converts the rather forgiving key mapping allowed by
-     * Guacamole.OnScreenKeyboard.Layout into a rigorous mapping of key name
+     * OnScreenKeyboard.Layout into a rigorous mapping of key name
      * to key definition, where the key definition is always an array of Key
      * objects.
      *
      * @private
-     * @param {!Object.<string, number|string|Guacamole.OnScreenKeyboard.Key|Guacamole.OnScreenKeyboard.Key[]>} keys
+     * @param {!Object.<string, number|string|OnScreenKeyboard.Key|OnScreenKeyboard.Key[]>} keys
      *     A mapping of key name to key definition, where the key definition is
      *     the title of the key (a string), the keysym (a number), a single
      *     Key object, or an array of Key objects.
      *
-     * @returns {!Object.<string, Guacamole.OnScreenKeyboard.Key[]>}
+     * @returns {!Object.<string, OnScreenKeyboard.Key[]>}
      *     A more-predictable mapping of key name to key definition, where the
      *     key definition is always simply an array of Key objects.
      */
@@ -542,7 +540,7 @@ Guacamole.OnScreenKeyboard = function(layout) {
      * Map of all key names to their corresponding set of keys. Each key name
      * may correspond to multiple keys due to the effect of modifiers.
      *
-     * @type {!Object.<string, Guacamole.OnScreenKeyboard.Key[]>}
+     * @type {!Object.<string, OnScreenKeyboard.Key[]>}
      */
     this.keys = getKeys(layout.keys);
 
@@ -793,11 +791,11 @@ Guacamole.OnScreenKeyboard = function(layout) {
  * keys, their behaviors, and their relative position and sizing.
  *
  * @constructor
- * @param {!(Guacamole.OnScreenKeyboard.Layout|object)} template
+ * @param {!(OnScreenKeyboard.Layout|object)} template
  *     The object whose identically-named properties will be used to initialize
  *     the properties of this layout.
  */
-Guacamole.OnScreenKeyboard.Layout = function(template) {
+OnScreenKeyboard.Layout = function(template) {
 
     /**
      * The language of keyboard layout, such as "en_US". This property is for
@@ -822,7 +820,7 @@ Guacamole.OnScreenKeyboard.Layout = function(template) {
      * implicitly. In all cases, the name property of the key object will be
      * taken from the name given in the mapping.
      *
-     * @type {!Object.<string, number|string|Guacamole.OnScreenKeyboard.Key|Guacamole.OnScreenKeyboard.Key[]>}
+     * @type {!Object.<string, number|string|OnScreenKeyboard.Key|OnScreenKeyboard.Key[]>}
      */
     this.keys = template.keys;
 
@@ -843,7 +841,7 @@ Guacamole.OnScreenKeyboard.Layout = function(template) {
      * The width of the entire keyboard, in arbitrary units. The width of each
      * key is relative to this width, as both width values are assumed to be in
      * the same units. The conversion factor between these units and pixels is
-     * derived later via a call to resize() on the Guacamole.OnScreenKeyboard.
+     * derived later via a call to resize() on the OnScreenKeyboard.
      *
      * @type {!number}
      */
@@ -864,12 +862,12 @@ Guacamole.OnScreenKeyboard.Layout = function(template) {
 /**
  * Represents a single key, or a single possible behavior of a key. Each key
  * on the on-screen keyboard must have at least one associated
- * Guacamole.OnScreenKeyboard.Key, whether that key is explicitly defined or
- * implied, and may have multiple Guacamole.OnScreenKeyboard.Key if behavior
+ * OnScreenKeyboard.Key, whether that key is explicitly defined or
+ * implied, and may have multiple OnScreenKeyboard.Key if behavior
  * depends on modifier states.
  *
  * @constructor
- * @param {!(Guacamole.OnScreenKeyboard.Key|object)} template
+ * @param {!(OnScreenKeyboard.Key|object)} template
  *     The object whose identically-named properties will be used to initialize
  *     the properties of this key.
  *     
@@ -878,7 +876,7 @@ Guacamole.OnScreenKeyboard.Layout = function(template) {
  *     any. If omitted, the name within the template will be used, assuming the
  *     template contains a name.
  */
-Guacamole.OnScreenKeyboard.Key = function(template, name) {
+OnScreenKeyboard.Key = function(template, name) {
 
     /**
      * The unique name identifying this key within the keyboard layout.

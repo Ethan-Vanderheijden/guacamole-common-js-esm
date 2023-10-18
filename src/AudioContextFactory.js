@@ -17,8 +17,6 @@
  * under the License.
  */
 
-var Guacamole = Guacamole || {};
-
 /**
  * Maintains a singleton instance of the Web Audio API AudioContext class,
  * instantiating the AudioContext only in response to the first call to
@@ -28,7 +26,7 @@ var Guacamole = Guacamole || {};
  *
  * @namespace
  */
-Guacamole.AudioContextFactory = {
+const AudioContextFactory = {
 
     /**
      * A singleton instance of a Web Audio API AudioContext object, or null if
@@ -59,11 +57,11 @@ Guacamole.AudioContextFactory = {
             try {
 
                 // Create new instance if none yet exists
-                if (!Guacamole.AudioContextFactory.singleton)
-                    Guacamole.AudioContextFactory.singleton = new AudioContext();
+                if (!AudioContextFactory.singleton)
+                    AudioContextFactory.singleton = new AudioContext();
 
                 // Return singleton instance
-                return Guacamole.AudioContextFactory.singleton;
+                return AudioContextFactory.singleton;
 
             }
             catch (e) {
@@ -77,3 +75,5 @@ Guacamole.AudioContextFactory = {
     }
 
 };
+
+export default AudioContextFactory;

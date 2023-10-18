@@ -17,8 +17,6 @@
  * under the License.
  */
 
-var Guacamole = Guacamole || {};
-
 /**
  * A Guacamole status. Each Guacamole status consists of a status code, defined
  * by the protocol, and an optional human-readable message, usually only
@@ -26,25 +24,25 @@ var Guacamole = Guacamole || {};
  *
  * @constructor
  * @param {!number} code
- *     The Guacamole status code, as defined by Guacamole.Status.Code.
+ *     The Guacamole status code, as defined by Status.Code.
  *
  * @param {string} [message]
  *     An optional human-readable message.
  */
-Guacamole.Status = function(code, message) {
+function Status(code, message) {
 
     /**
-     * Reference to this Guacamole.Status.
+     * Reference to this Status.
      *
      * @private
-     * @type {!Guacamole.Status}
+     * @type {!Status}
      */
     var guac_status = this;
 
     /**
      * The Guacamole status code.
      *
-     * @see Guacamole.Status.Code
+     * @see Status.Code
      * @type {!number}
      */
     this.code = code;
@@ -74,7 +72,7 @@ Guacamole.Status = function(code, message) {
 /**
  * Enumeration of all Guacamole status codes.
  */
-Guacamole.Status.Code = {
+Status.Code = {
 
     /**
      * The operation succeeded.
@@ -249,35 +247,35 @@ Guacamole.Status.Code = {
  *     The Guacamole protocol status code which most closely represents the
  *     given HTTP status code.
  */
-Guacamole.Status.Code.fromHTTPCode = function fromHTTPCode(status) {
+Status.Code.fromHTTPCode = function fromHTTPCode(status) {
 
     // Translate status codes with known equivalents
     switch (status) {
 
         // HTTP 400 - Bad request
         case 400:
-            return Guacamole.Status.Code.CLIENT_BAD_REQUEST;
+            return Status.Code.CLIENT_BAD_REQUEST;
 
         // HTTP 403 - Forbidden
         case 403:
-            return Guacamole.Status.Code.CLIENT_FORBIDDEN;
+            return Status.Code.CLIENT_FORBIDDEN;
 
         // HTTP 404 - Resource not found
         case 404:
-            return Guacamole.Status.Code.RESOURCE_NOT_FOUND;
+            return Status.Code.RESOURCE_NOT_FOUND;
 
         // HTTP 429 - Too many requests
         case 429:
-            return Guacamole.Status.Code.CLIENT_TOO_MANY;
+            return Status.Code.CLIENT_TOO_MANY;
 
         // HTTP 503 - Server unavailable
         case 503:
-            return Guacamole.Status.Code.SERVER_BUSY;
+            return Status.Code.SERVER_BUSY;
 
     }
 
     // Default all other codes to generic internal error
-    return Guacamole.Status.Code.SERVER_ERROR;
+    return Status.Code.SERVER_ERROR;
 
 };
 
@@ -293,30 +291,32 @@ Guacamole.Status.Code.fromHTTPCode = function fromHTTPCode(status) {
  *     The Guacamole protocol status code which most closely represents the
  *     given WebSocket status code.
  */
-Guacamole.Status.Code.fromWebSocketCode = function fromWebSocketCode(code) {
+Status.Code.fromWebSocketCode = function fromWebSocketCode(code) {
 
     // Translate status codes with known equivalents
     switch (code) {
 
         // Successful disconnect (no error)
         case 1000: // Normal Closure
-            return Guacamole.Status.Code.SUCCESS;
+            return Status.Code.SUCCESS;
 
         // Codes which indicate the server is not reachable
         case 1006: // Abnormal Closure (also signalled by JavaScript when the connection cannot be opened in the first place)
         case 1015: // TLS Handshake
-            return Guacamole.Status.Code.UPSTREAM_NOT_FOUND;
+            return Status.Code.UPSTREAM_NOT_FOUND;
 
         // Codes which indicate the server is reachable but busy/unavailable
         case 1001: // Going Away
         case 1012: // Service Restart
         case 1013: // Try Again Later
         case 1014: // Bad Gateway
-            return Guacamole.Status.Code.UPSTREAM_UNAVAILABLE;
+            return Status.Code.UPSTREAM_UNAVAILABLE;
 
     }
 
     // Default all other codes to generic internal error
-    return Guacamole.Status.Code.SERVER_ERROR;
+    return Status.Code.SERVER_ERROR;
 
 };
+
+export default Status;

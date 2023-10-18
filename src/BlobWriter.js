@@ -17,34 +17,34 @@
  * under the License.
  */
 
-var Guacamole = Guacamole || {};
+import ArrayBufferWriter from './ArrayBufferWriter.js';
 
 /**
  * A writer which automatically writes to the given output stream with the
  * contents of provided Blob objects.
  *
  * @constructor
- * @param {!Guacamole.OutputStream} stream
+ * @param {!OutputStream} stream
  *     The stream that data will be written to.
  */
-Guacamole.BlobWriter = function BlobWriter(stream) {
+export default function BlobWriter(stream) {
 
     /**
-     * Reference to this Guacamole.BlobWriter.
+     * Reference to this BlobWriter.
      *
      * @private
-     * @type {!Guacamole.BlobWriter}
+     * @type {!BlobWriter}
      */
     var guacWriter = this;
 
     /**
-     * Wrapped Guacamole.ArrayBufferWriter which will be used to send any
+     * Wrapped ArrayBufferWriter which will be used to send any
      * provided file data.
      *
      * @private
-     * @type {!Guacamole.ArrayBufferWriter}
+     * @type {!ArrayBufferWriter}
      */
-    var arrayBufferWriter = new Guacamole.ArrayBufferWriter(stream);
+    var arrayBufferWriter = new ArrayBufferWriter(stream);
 
     // Initially, simply call onack for acknowledgements
     arrayBufferWriter.onack = function(status) {
@@ -112,7 +112,7 @@ Guacamole.BlobWriter = function BlobWriter(stream) {
 
         /**
          * Reads the next chunk of the blob provided to
-         * [sendBlob()]{@link Guacamole.BlobWriter#sendBlob}. The chunk itself
+         * [sendBlob()]{@link BlobWriter#sendBlob}. The chunk itself
          * is read asynchronously, and will not be available until
          * reader.onload fires.
          *
@@ -196,14 +196,14 @@ Guacamole.BlobWriter = function BlobWriter(stream) {
      * Fired for received data, if acknowledged by the server.
      *
      * @event
-     * @param {!Guacamole.Status} status
+     * @param {!Status} status
      *     The status of the operation.
      */
     this.onack = null;
 
     /**
      * Fired when an error occurs reading a blob passed to
-     * [sendBlob()]{@link Guacamole.BlobWriter#sendBlob}. The transfer for the
+     * [sendBlob()]{@link BlobWriter#sendBlob}. The transfer for the
      * the given blob will cease, but the stream will remain open.
      *
      * @event
@@ -220,7 +220,7 @@ Guacamole.BlobWriter = function BlobWriter(stream) {
 
     /**
      * Fired for each successfully-read chunk of data as a blob is being sent
-     * via [sendBlob()]{@link Guacamole.BlobWriter#sendBlob}.
+     * via [sendBlob()]{@link BlobWriter#sendBlob}.
      *
      * @event
      * @param {!Blob} blob
@@ -233,7 +233,7 @@ Guacamole.BlobWriter = function BlobWriter(stream) {
 
     /**
      * Fired when a blob passed to
-     * [sendBlob()]{@link Guacamole.BlobWriter#sendBlob} has finished being
+     * [sendBlob()]{@link BlobWriter#sendBlob} has finished being
      * sent.
      *
      * @event

@@ -17,19 +17,22 @@
  * under the License.
  */
 
-var Guacamole = Guacamole || {};
+import KeyEventInterpreter from './KeyEventInterpreter.js';
+import Parser from './Parser.js';
+import Client from './Client.js';
+import { Tunnel } from './Tunnel.js';
 
 /**
- * A recording of a Guacamole session. Given a {@link Guacamole.Tunnel} or Blob,
- * the Guacamole.SessionRecording automatically parses Guacamole instructions
+ * A recording of a Guacamole session. Given a {@link Tunnel} or Blob,
+ * the SessionRecording automatically parses Guacamole instructions
  * within the recording source as it plays back the recording. Playback of the
  * recording may be controlled through function calls to the
- * Guacamole.SessionRecording, even while the recording has not yet finished
+ * SessionRecording, even while the recording has not yet finished
  * being created or downloaded. Parsing of the contents of the recording will
  * begin immediately and automatically after this constructor is invoked.
  *
  * @constructor
- * @param {!Blob|Guacamole.Tunnel} source
+ * @param {!Blob|Tunnel} source
  *     The Blob from which the instructions of the recording should
  *     be read.
  * @param {number} [refreshInterval=1000]
@@ -39,17 +42,17 @@ var Guacamole = Guacamole || {};
  *     updated when seek requests are made, or when new frames are rendered.
  *     If not specified, refreshInterval will default to 1000 milliseconds.
  */
-Guacamole.SessionRecording = function SessionRecording(source, refreshInterval) {
+function SessionRecording(source, refreshInterval) {
 
     // Default the refresh interval to 1 second if not specified otherwise
     if (refreshInterval === undefined)
         refreshInterval = 1000;
 
     /**
-     * Reference to this Guacamole.SessionRecording.
+     * Reference to this SessionRecording.
      *
      * @private
-     * @type {!Guacamole.SessionRecording}
+     * @type {!SessionRecording}
      */
     var recording = this;
 
@@ -68,12 +71,12 @@ Guacamole.SessionRecording = function SessionRecording(source, refreshInterval) 
      * will be null.
      *
      * @private
-     * @type {Guacamole.Tunnel}
+     * @type {Tunnel}
      */
     var tunnel = null;
 
     /**
-     * The number of bytes that this Guacamole.SessionRecording should attempt
+     * The number of bytes that this SessionRecording should attempt
      * to read from the given blob in each read operation. Larger blocks will
      * generally read the blob more quickly, but may result in excessive
      * time being spent within the parser, making the page unresponsive
@@ -108,7 +111,7 @@ Guacamole.SessionRecording = function SessionRecording(source, refreshInterval) 
      * All frames parsed from the provided blob.
      *
      * @private
-     * @type {!Guacamole.SessionRecording._Frame[]}
+     * @type {!Frame[]}
      */
     var frames = [];
 
@@ -123,21 +126,21 @@ Guacamole.SessionRecording = function SessionRecording(source, refreshInterval) 
 
     /**
      * Tunnel which feeds arbitrary instructions to the client used by this
-     * Guacamole.SessionRecording for playback of the session recording.
+     * SessionRecording for playback of the session recording.
      *
      * @private
-     * @type {!Guacamole.SessionRecording._PlaybackTunnel}
+     * @type {!PlaybackTunnel}
      */
-    var playbackTunnel = new Guacamole.SessionRecording._PlaybackTunnel();
+    var playbackTunnel = new PlaybackTunnel();
 
     /**
-     * Guacamole.Client instance used for visible playback of the session
+     * Client instance used for visible playback of the session
      * recording.
      *
      * @private
-     * @type {!Guacamole.Client}
+     * @type {!Client}
      */
-    var playbackClient = new Guacamole.Client(playbackTunnel);
+    var playbackClient = new Client(playbackTunnel);
 
     /**
      * The current frame rendered within the playback client. If no frame is
@@ -254,7 +257,7 @@ Guacamole.SessionRecording = function SessionRecording(source, refreshInterval) 
      * the end of the blob has been reached (no instructions remain to be
      * parsed), the provided completion callback is invoked. If a parse
      * error prevents reading instructions from the blob, the onerror
-     * callback of the Guacamole.SessionRecording is invoked, and no further
+     * callback of the SessionRecording is invoked, and no further
      * data is handled within the blob.
      *
      * @private
@@ -264,7 +267,7 @@ Guacamole.SessionRecording = function SessionRecording(source, refreshInterval) 
      * @param {function} [instructionCallback]
      *     The callback to invoke for each Guacamole instruction read from
      *     the given blob. This function must accept the same arguments
-     *     as the oninstruction handler of Guacamole.Parser.
+     *     as the oninstruction handler of Parser.
      *
      * @param {function} [completionCallback]
      *     The callback to invoke once all instructions have been read from
@@ -279,7 +282,7 @@ Guacamole.SessionRecording = function SessionRecording(source, refreshInterval) 
         // Prepare a parser to handle all instruction data within the blob,
         // automatically invoking the provided instruction callback for all
         // parsed instructions
-        var parser = new Guacamole.Parser();
+        var parser = new Parser();
         parser.oninstruction = instructionCallback;
 
         var offset = 0;
@@ -380,7 +383,7 @@ Guacamole.SessionRecording = function SessionRecording(source, refreshInterval) 
      * human-readable batches of text. Constrcution is deferred until the first
      * event is processed, to enable recording-relative timestamps.
      *
-     * @type {!Guacamole.KeyEventInterpreter}
+     * @type {!KeyEventInterpreter}
      */
     var keyEventInterpreter = null;
 
@@ -394,7 +397,7 @@ Guacamole.SessionRecording = function SessionRecording(source, refreshInterval) 
      *     the recording.
      */
     function initializeKeyInterpreter(startTimestamp) {
-        keyEventInterpreter = new Guacamole.KeyEventInterpreter(startTimestamp);
+        keyEventInterpreter = new KeyEventInterpreter(startTimestamp);
     }
 
     /**
@@ -424,7 +427,7 @@ Guacamole.SessionRecording = function SessionRecording(source, refreshInterval) 
             var timestamp = parseInt(args[0]);
 
             // Add a new frame containing the instructions read since last frame
-            var frame = new Guacamole.SessionRecording._Frame(timestamp, frameStart, frameEnd);
+            var frame = new Frame(timestamp, frameStart, frameEnd);
             frames.push(frame);
             frameStart = frameEnd;
 
@@ -509,7 +512,7 @@ Guacamole.SessionRecording = function SessionRecording(source, refreshInterval) 
         };
 
         tunnel.onstatechange = function tunnelStateChanged(state) {
-            if (state === Guacamole.Tunnel.State.CLOSED) {
+            if (state === Tunnel.State.CLOSED) {
 
                 // Append any remaining instructions
                 if (instructionBuffer.length) {
@@ -913,7 +916,7 @@ Guacamole.SessionRecording = function SessionRecording(source, refreshInterval) 
      * if no key events were extracted.
      *
      * @event
-     * @param {!Guacamole.KeyEventInterpreter.KeyEvent[]} batch
+     * @param {!KeyEventInterpreter.KeyEvent[]} batch
      *     The extracted key events.
      */
     this.onkeyevents = null;
@@ -980,14 +983,14 @@ Guacamole.SessionRecording = function SessionRecording(source, refreshInterval) 
     };
 
     /**
-     * Returns the underlying display of the Guacamole.Client used by this
-     * Guacamole.SessionRecording for playback. The display contains an Element
+     * Returns the underlying display of the Client used by this
+     * SessionRecording for playback. The display contains an Element
      * which can be added to the DOM, causing the display (and thus playback of
      * the recording) to become visible.
      *
-     * @return {!Guacamole.Display}
-     *     The underlying display of the Guacamole.Client used by this
-     *     Guacamole.SessionRecording for playback.
+     * @return {!Display}
+     *     The underlying display of the Client used by this
+     *     SessionRecording for playback.
      */
     this.getDisplay = function getDisplay() {
         return playbackClient.getDisplay();
@@ -1038,7 +1041,7 @@ Guacamole.SessionRecording = function SessionRecording(source, refreshInterval) 
      * Begins continuous playback of the recording downloaded thus far.
      * Playback of the recording will continue until pause() is invoked or
      * until no further frames exist. Playback is initially paused when a
-     * Guacamole.SessionRecording is created, and must be explicitly started
+     * SessionRecording is created, and must be explicitly started
      * through a call to this function. If playback is already in progress,
      * this function has no effect. If a seek operation is in progress,
      * playback resumes at the current position, and the seek is aborted as if
@@ -1150,7 +1153,7 @@ Guacamole.SessionRecording = function SessionRecording(source, refreshInterval) 
      * Pauses playback of the recording, if playback is currently in progress.
      * If playback is not in progress, this function has no effect. If a seek
      * operation is in progress, the seek is aborted. Playback is initially
-     * paused when a Guacamole.SessionRecording is created, and must be
+     * paused when a SessionRecording is created, and must be
      * explicitly started through a call to play().
      */
     this.pause = function pause() {
@@ -1204,7 +1207,7 @@ Guacamole.SessionRecording = function SessionRecording(source, refreshInterval) 
  *     The byte offset within the blob of character which follows the last
  *     character of the last instruction of this frame.
  */
-Guacamole.SessionRecording._Frame = function _Frame(timestamp, start, end) {
+function Frame(timestamp, start, end) {
 
     /**
      * Whether this frame should be used as a keyframe if possible. This value
@@ -1256,20 +1259,20 @@ Guacamole.SessionRecording._Frame = function _Frame(timestamp, start, end) {
 };
 
 /**
- * A read-only Guacamole.Tunnel implementation which streams instructions
+ * A read-only Tunnel implementation which streams instructions
  * received through explicit calls to its receiveInstruction() function.
  *
  * @private
  * @constructor
- * @augments {Guacamole.Tunnel}
+ * @augments {Tunnel}
  */
-Guacamole.SessionRecording._PlaybackTunnel = function _PlaybackTunnel() {
+function PlaybackTunnel() {
 
     /**
-     * Reference to this Guacamole.SessionRecording._PlaybackTunnel.
+     * Reference to this PlaybackTunnel.
      *
      * @private
-     * @type {!Guacamole.SessionRecording._PlaybackTunnel}
+     * @type {!PlaybackTunnel}
      */
     var tunnel = this;
 
@@ -1287,7 +1290,7 @@ Guacamole.SessionRecording._PlaybackTunnel = function _PlaybackTunnel() {
 
     /**
      * Invokes this tunnel's oninstruction handler, notifying users of this
-     * tunnel (such as a Guacamole.Client instance) that an instruction has
+     * tunnel (such as a Client instance) that an instruction has
      * been received. If the oninstruction handler has not been set, this
      * function has no effect.
      *
@@ -1303,3 +1306,5 @@ Guacamole.SessionRecording._PlaybackTunnel = function _PlaybackTunnel() {
     };
 
 };
+
+export default SessionRecording;

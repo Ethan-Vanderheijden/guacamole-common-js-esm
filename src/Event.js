@@ -17,10 +17,8 @@
  * under the License.
  */
 
-var Guacamole = Guacamole || {};
-
 /**
- * An arbitrary event, emitted by a {@link Guacamole.Event.Target}. This object
+ * An arbitrary event, emitted by a {@link Event.Target}. This object
  * should normally serve as the base class for a different object that is more
  * specific to the event type.
  *
@@ -28,7 +26,7 @@ var Guacamole = Guacamole || {};
  * @param {!string} type
  *     The unique name of this event type.
  */
-Guacamole.Event = function Event(type) {
+function Event(type) {
 
     /**
      * The unique name of this event type.
@@ -58,19 +56,19 @@ Guacamole.Event = function Event(type) {
     /**
      * Requests that the legacy event handler associated with this event be
      * invoked on the given event target. This function will be invoked
-     * automatically by implementations of {@link Guacamole.Event.Target}
-     * whenever {@link Guacamole.Event.Target#emit emit()} is invoked.
+     * automatically by implementations of {@link Event.Target}
+     * whenever {@link Event.Target#emit emit()} is invoked.
      * <p>
      * Older versions of Guacamole relied on single event handlers with the
-     * prefix "on", such as "onmousedown" or "onkeyup". If a Guacamole.Event
+     * prefix "on", such as "onmousedown" or "onkeyup". If a Event
      * implementation is replacing the event previously represented by one of
      * these handlers, this function gives the implementation the opportunity
      * to provide backward compatibility with the old handler.
      * <p>
      * Unless overridden, this function does nothing.
      *
-     * @param {!Guacamole.Event.Target} eventTarget
-     *     The {@link Guacamole.Event.Target} that emitted this event.
+     * @param {!Event.Target} eventTarget
+     *     The {@link Event.Target} that emitted this event.
      */
     this.invokeLegacyHandler = function invokeLegacyHandler(eventTarget) {
         // Do nothing
@@ -79,27 +77,27 @@ Guacamole.Event = function Event(type) {
 };
 
 /**
- * A {@link Guacamole.Event} that may relate to one or more DOM events.
+ * A {@link Event} that may relate to one or more DOM events.
  * Continued propagation and default behavior of the related DOM events may be
- * prevented with {@link Guacamole.Event.DOMEvent#stopPropagation stopPropagation()}
- * and {@link Guacamole.Event.DOMEvent#preventDefault preventDefault()}
+ * prevented with {@link Event.DOMEvent#stopPropagation stopPropagation()}
+ * and {@link Event.DOMEvent#preventDefault preventDefault()}
  * respectively.
  *
  * @constructor
- * @augments Guacamole.Event
+ * @augments Event
  *
  * @param {!string} type
  *     The unique name of this event type.
  *
  * @param {Event|Event[]} [events=[]]
  *     The DOM events that are related to this event, if any. Future calls to
- *     {@link Guacamole.Event.DOMEvent#preventDefault preventDefault()} and
- *     {@link Guacamole.Event.DOMEvent#stopPropagation stopPropagation()} will
+ *     {@link Event.DOMEvent#preventDefault preventDefault()} and
+ *     {@link Event.DOMEvent#stopPropagation stopPropagation()} will
  *     affect these events.
  */
-Guacamole.Event.DOMEvent = function DOMEvent(type, events) {
+Event.DOMEvent = function DOMEvent(type, events) {
 
-    Guacamole.Event.call(this, type);
+    Event.call(this, type);
 
     // Default to empty array
     events = events || [];
@@ -140,58 +138,58 @@ Guacamole.Event.DOMEvent = function DOMEvent(type, events) {
  * @param {!Event} event
  *     The DOM event to cancel.
  */
-Guacamole.Event.DOMEvent.cancelEvent = function cancelEvent(event) {
+Event.DOMEvent.cancelEvent = function cancelEvent(event) {
     event.stopPropagation();
     if (event.preventDefault) event.preventDefault();
     event.returnValue = false;
 };
 
 /**
- * An object which can dispatch {@link Guacamole.Event} objects. Listeners
- * registered with {@link Guacamole.Event.Target#on on()} will automatically
- * be invoked based on the type of {@link Guacamole.Event} passed to
- * {@link Guacamole.Event.Target#dispatch dispatch()}. It is normally
- * subclasses of Guacamole.Event.Target that will dispatch events, and usages
+ * An object which can dispatch {@link Event} objects. Listeners
+ * registered with {@link Event.Target#on on()} will automatically
+ * be invoked based on the type of {@link Event} passed to
+ * {@link Event.Target#dispatch dispatch()}. It is normally
+ * subclasses of Event.Target that will dispatch events, and usages
  * of those subclasses that will catch dispatched events with on().
  *
  * @constructor
  */
-Guacamole.Event.Target = function Target() {
+Event.Target = function Target() {
 
     /**
      * A callback function which handles an event dispatched by an event
      * target.
      *
-     * @callback Guacamole.Event.Target~listener
-     * @param {!Guacamole.Event} event
+     * @callback Event.Target~listener
+     * @param {!Event} event
      *     The event that was dispatched.
      *
-     * @param {!Guacamole.Event.Target} target
+     * @param {!Event.Target} target
      *     The object that dispatched the event.
      */
 
     /**
      * All listeners (callback functions) registered for each event type passed
-     * to {@link Guacamole.Event.Targer#on on()}.
+     * to {@link Event.Targer#on on()}.
      *
      * @private
-     * @type {!Object.<string, Guacamole.Event.Target~listener[]>}
+     * @type {!Object.<string, Event.Target~listener[]>}
      */
     var listeners = {};
 
     /**
      * Registers a listener for events having the given type, as dictated by
-     * the {@link Guacamole.Event#type type} property of {@link Guacamole.Event}
-     * provided to {@link Guacamole.Event.Target#dispatch dispatch()}.
+     * the {@link Event#type type} property of {@link Event}
+     * provided to {@link Event.Target#dispatch dispatch()}.
      *
      * @param {!string} type
      *     The unique name of this event type.
      *
-     * @param {!Guacamole.Event.Target~listener} listener
+     * @param {!Event.Target~listener} listener
      *     The function to invoke when an event having the given type is
-     *     dispatched. The {@link Guacamole.Event} object provided to
-     *     {@link Guacamole.Event.Target#dispatch dispatch()} will be passed to
-     *     this function, along with the dispatching Guacamole.Event.Target.
+     *     dispatched. The {@link Event} object provided to
+     *     {@link Event.Target#dispatch dispatch()} will be passed to
+     *     this function, along with the dispatching Event.Target.
      */
     this.on = function on(type, listener) {
 
@@ -205,21 +203,21 @@ Guacamole.Event.Target = function Target() {
 
     /**
      * Registers a listener for events having the given types, as dictated by
-     * the {@link Guacamole.Event#type type} property of {@link Guacamole.Event}
-     * provided to {@link Guacamole.Event.Target#dispatch dispatch()}.
+     * the {@link Event#type type} property of {@link Event}
+     * provided to {@link Event.Target#dispatch dispatch()}.
      * <p>
      * Invoking this function is equivalent to manually invoking
-     * {@link Guacamole.Event.Target#on on()} for each of the provided types.
+     * {@link Event.Target#on on()} for each of the provided types.
      *
      * @param {!string[]} types
      *     The unique names of the event types to associate with the given
      *     listener.
      *
-     * @param {!Guacamole.Event.Target~listener} listener
+     * @param {!Event.Target~listener} listener
      *     The function to invoke when an event having any of the given types
-     *     is dispatched. The {@link Guacamole.Event} object provided to
-     *     {@link Guacamole.Event.Target#dispatch dispatch()} will be passed to
-     *     this function, along with the dispatching Guacamole.Event.Target.
+     *     is dispatched. The {@link Event} object provided to
+     *     {@link Event.Target#dispatch dispatch()} will be passed to
+     *     this function, along with the dispatching Event.Target.
      */
     this.onEach = function onEach(types, listener) {
         types.forEach(function addListener(type) {
@@ -229,10 +227,10 @@ Guacamole.Event.Target = function Target() {
 
     /**
      * Dispatches the given event, invoking all event handlers registered with
-     * this Guacamole.Event.Target for that event's
-     * {@link Guacamole.Event#type type}.
+     * this Event.Target for that event's
+     * {@link Event#type type}.
      *
-     * @param {!Guacamole.Event} event
+     * @param {!Event} event
      *     The event to dispatch.
      */
     this.dispatch = function dispatch(event) {
@@ -252,8 +250,8 @@ Guacamole.Event.Target = function Target() {
 
     /**
      * Unregisters a listener that was previously registered with
-     * {@link Guacamole.Event.Target#on on()} or
-     * {@link Guacamole.Event.Target#onEach onEach()}. If no such listener was
+     * {@link Event.Target#on on()} or
+     * {@link Event.Target#onEach onEach()}. If no such listener was
      * registered, this function has no effect. If multiple copies of the same
      * listener were registered, the first listener still registered will be
      * removed.
@@ -262,10 +260,10 @@ Guacamole.Event.Target = function Target() {
      *     The unique name of the event type handled by the listener being
      *     removed.
      *
-     * @param {!Guacamole.Event.Target~listener} listener
+     * @param {!Event.Target~listener} listener
      *     The listener function previously provided to
-     *     {@link Guacamole.Event.Target#on on()}or
-     *     {@link Guacamole.Event.Target#onEach onEach()}.
+     *     {@link Event.Target#on on()}or
+     *     {@link Event.Target#onEach onEach()}.
      *
      * @returns {!boolean}
      *     true if the specified listener was removed, false otherwise.
@@ -289,23 +287,23 @@ Guacamole.Event.Target = function Target() {
 
     /**
      * Unregisters listeners that were previously registered with
-     * {@link Guacamole.Event.Target#on on()} or
-     * {@link Guacamole.Event.Target#onEach onEach()}. If no such listeners
+     * {@link Event.Target#on on()} or
+     * {@link Event.Target#onEach onEach()}. If no such listeners
      * were registered, this function has no effect. If multiple copies of the
      * same listener were registered for the same event type, the first
      * listener still registered will be removed.
      * <p>
      * Invoking this function is equivalent to manually invoking
-     * {@link Guacamole.Event.Target#off off()} for each of the provided types.
+     * {@link Event.Target#off off()} for each of the provided types.
      *
      * @param {!string[]} types
      *     The unique names of the event types handled by the listeners being
      *     removed.
      *
-     * @param {!Guacamole.Event.Target~listener} listener
+     * @param {!Event.Target~listener} listener
      *     The listener function previously provided to
-     *     {@link Guacamole.Event.Target#on on()} or
-     *     {@link Guacamole.Event.Target#onEach onEach()}.
+     *     {@link Event.Target#on on()} or
+     *     {@link Event.Target#onEach onEach()}.
      *
      * @returns {!boolean}
      *     true if any of the specified listeners were removed, false
@@ -324,3 +322,5 @@ Guacamole.Event.Target = function Target() {
     };
 
 };
+
+export default Event;

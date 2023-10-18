@@ -17,28 +17,26 @@
  * under the License.
  */
 
-var Guacamole = Guacamole || {};
-
 /**
  * A reader which automatically handles the given input stream, returning
  * received blobs as a single data URI built over the course of the stream.
  * Note that this object will overwrite any installed event handlers on the
- * given Guacamole.InputStream.
+ * given InputStream.
  * 
  * @constructor
- * @param {!Guacamole.InputStream} stream
+ * @param {!InputStream} stream
  *     The stream that data will be read from.
  *
  * @param {!string} mimetype
  *     The mimetype of the data being received.
  */
-Guacamole.DataURIReader = function(stream, mimetype) {
+export default function(stream, mimetype) {
 
     /**
-     * Reference to this Guacamole.DataURIReader.
+     * Reference to this DataURIReader.
      *
      * @private
-     * @type {!Guacamole.DataURIReader}
+     * @type {!DataURIReader}
      */
     var guac_reader = this;
 

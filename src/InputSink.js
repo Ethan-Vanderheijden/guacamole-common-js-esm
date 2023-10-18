@@ -17,8 +17,6 @@
  * under the License.
  */
 
-var Guacamole = Guacamole || {};
-
 /**
  * A hidden input field which attempts to keep itself focused at all times,
  * except when another input field has been intentionally focused, whether
@@ -29,13 +27,13 @@ var Guacamole = Guacamole || {};
  *
  * @constructor
  */
-Guacamole.InputSink = function InputSink() {
+export default function InputSink() {
 
     /**
-     * Reference to this instance of Guacamole.InputSink.
+     * Reference to this instance of InputSink.
      *
      * @private
-     * @type {!Guacamole.InputSink}
+     * @type {!InputSink}
      */
     var sink = this;
 
@@ -98,7 +96,7 @@ Guacamole.InputSink = function InputSink() {
 
     /**
      * Returns the underlying input field. This input field MUST be manually
-     * added to the DOM for the Guacamole.InputSink to have any effect.
+     * added to the DOM for the InputSink to have any effect.
      *
      * @returns {!Element}
      *     The underlying input field.

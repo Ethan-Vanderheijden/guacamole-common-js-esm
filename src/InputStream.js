@@ -17,26 +17,24 @@
  * under the License.
  */
 
-var Guacamole = Guacamole || {};
-
 /**
  * An input stream abstraction used by the Guacamole client to facilitate
  * transfer of files or other binary data.
  * 
  * @constructor
- * @param {!Guacamole.Client} client
+ * @param {!Client} client
  *     The client owning this stream.
  *
  * @param {!number} index
  *     The index of this stream.
  */
-Guacamole.InputStream = function(client, index) {
+export default function(client, index) {
 
     /**
      * Reference to this stream.
      *
      * @private
-     * @type {!Guacamole.InputStream}
+     * @type {!InputStream}
      */
     var guac_stream = this;
 

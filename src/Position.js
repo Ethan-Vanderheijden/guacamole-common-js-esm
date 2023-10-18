@@ -17,17 +17,15 @@
  * under the License.
  */
 
-var Guacamole = Guacamole || {};
-
 /**
  * A position in 2-D space.
  *
  * @constructor
- * @param {Guacamole.Position|object} [template={}]
+ * @param {Position|object} [template={}]
  *     The object whose properties should be copied within the new
- *     Guacamole.Position.
+ *     Position.
  */
-Guacamole.Position = function Position(template) {
+function Position(template) {
 
     template = template || {};
 
@@ -92,7 +90,7 @@ Guacamole.Position = function Position(template) {
 };
 
 /**
- * Returns a new {@link Guacamole.Position} representing the relative position
+ * Returns a new {@link Position} representing the relative position
  * of the given clientX/clientY coordinates within the given element. The
  * clientX and clientY coordinates are relative to the browser viewport and are
  * commonly available within JavaScript event objects. The final position is
@@ -107,12 +105,14 @@ Guacamole.Position = function Position(template) {
  * @param {!number} clientY
  *     The viewport-relative Y coordinate to translate.
  *
- * @returns {!Guacamole.Position}
- *     A new Guacamole.Position representing the relative position of the given
+ * @returns {!Position}
+ *     A new Position representing the relative position of the given
  *     client coordinates.
  */
-Guacamole.Position.fromClientPosition = function fromClientPosition(element, clientX, clientY) {
-    var position = new Guacamole.Position();
+Position.fromClientPosition = function fromClientPosition(element, clientX, clientY) {
+    var position = new Position();
     position.fromClientPosition(element, clientX, clientY);
     return position;
 };
+
+export default Position;

@@ -17,23 +17,21 @@
  * under the License.
  */
 
-var Guacamole = Guacamole || {};
-
 /**
  * A writer which automatically writes to the given output stream with arbitrary
  * binary data, supplied as ArrayBuffers.
  * 
  * @constructor
- * @param {!Guacamole.OutputStream} stream
+ * @param {!OutputStream} stream
  *     The stream that data will be written to.
  */
-Guacamole.ArrayBufferWriter = function(stream) {
+export default function(stream) {
 
     /**
-     * Reference to this Guacamole.StringWriter.
+     * Reference to this ArrayBufferWriter.
      *
      * @private
-     * @type {!Guacamole.ArrayBufferWriter}
+     * @type {!ArrayBufferWriter}
      */
     var guac_writer = this;
 
@@ -65,18 +63,18 @@ Guacamole.ArrayBufferWriter = function(stream) {
     }
 
     /**
-     * The maximum length of any blob sent by this Guacamole.ArrayBufferWriter,
+     * The maximum length of any blob sent by this ArrayBufferWriter,
      * in bytes. Data sent via
-     * [sendData()]{@link Guacamole.ArrayBufferWriter#sendData} which exceeds
+     * [sendData()]{@link ArrayBufferWriter#sendData} which exceeds
      * this length will be split into multiple blobs. As the Guacamole protocol
      * limits the maximum size of any instruction or instruction element to
      * 8192 bytes, and the contents of blobs will be base64-encoded, this value
      * should only be increased with extreme caution.
      *
      * @type {!number}
-     * @default {@link Guacamole.ArrayBufferWriter.DEFAULT_BLOB_LENGTH}
+     * @default {@link ArrayBufferWriter.DEFAULT_BLOB_LENGTH}
      */
-    this.blobLength = Guacamole.ArrayBufferWriter.DEFAULT_BLOB_LENGTH;
+    this.blobLength = ArrayBufferWriter.DEFAULT_BLOB_LENGTH;
 
     /**
      * Sends the given data.
@@ -111,7 +109,7 @@ Guacamole.ArrayBufferWriter = function(stream) {
     /**
      * Fired for received data, if acknowledged by the server.
      * @event
-     * @param {!Guacamole.Status} status
+     * @param {!Status} status
      *     The status of the operation.
      */
     this.onack = null;
@@ -119,10 +117,10 @@ Guacamole.ArrayBufferWriter = function(stream) {
 };
 
 /**
- * The default maximum blob length for new Guacamole.ArrayBufferWriter
+ * The default maximum blob length for new ArrayBufferWriter
  * instances.
  *
  * @constant
  * @type {!number}
  */
-Guacamole.ArrayBufferWriter.DEFAULT_BLOB_LENGTH = 6048;
+export const DEFAULT_BLOB_LENGTH = 6048;

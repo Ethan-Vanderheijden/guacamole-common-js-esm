@@ -17,26 +17,24 @@
  * under the License.
  */
 
-var Guacamole = Guacamole || {};
-
 /**
  * An object used by the Guacamole client to house arbitrarily-many named
  * input and output streams.
  * 
  * @constructor
- * @param {!Guacamole.Client} client
+ * @param {!Client} client
  *     The client owning this object.
  *
  * @param {!number} index
  *     The index of this object.
  */
-Guacamole.Object = function guacamoleObject(client, index) {
+function Object(client, index) {
 
     /**
-     * Reference to this Guacamole.Object.
+     * Reference to this Object.
      *
      * @private
-     * @type {!Guacamole.Object}
+     * @type {!Object}
      */
     var guacObject = this;
 
@@ -119,7 +117,7 @@ Guacamole.Object = function guacamoleObject(client, index) {
      * handler here.
      *
      * @event
-     * @param {!Guacamole.InputStream} inputStream
+     * @param {!InputStream} inputStream
      *     The input stream of the received body.
      *
      * @param {!string} mimetype
@@ -154,7 +152,7 @@ Guacamole.Object = function guacamoleObject(client, index) {
      *
      * @param {function} [bodyCallback]
      *     The callback to invoke when the body of the requested input stream
-     *     is received. This callback will be provided a Guacamole.InputStream
+     *     is received. This callback will be provided a InputStream
      *     and its mimetype as its two only arguments. If the onbody handler of
      *     this object is overridden, this callback will not be invoked.
      */
@@ -180,7 +178,7 @@ Guacamole.Object = function guacamoleObject(client, index) {
      * @param {!string} name
      *     The defined name of an output stream within this object.
      *
-     * @returns {!Guacamole.OutputStream}
+     * @returns {!OutputStream}
      *     An output stream which will write blobs to the named output stream
      *     of this object.
      */
@@ -197,14 +195,16 @@ Guacamole.Object = function guacamoleObject(client, index) {
  * @constant
  * @type {!string}
  */
-Guacamole.Object.ROOT_STREAM = '/';
+Object.ROOT_STREAM = '/';
 
 /**
  * The mimetype of a stream containing JSON which maps available stream names
- * to their corresponding mimetype. The root stream of a Guacamole.Object MUST
+ * to their corresponding mimetype. The root stream of a Object MUST
  * have this mimetype.
  *
  * @constant
  * @type {!string}
  */
-Guacamole.Object.STREAM_INDEX_MIMETYPE = 'application/vnd.glyptodon.guacamole.stream-index+json';
+Object.STREAM_INDEX_MIMETYPE = 'application/vnd.glyptodon.guacamole.stream-index+json';
+
+export default Object;

@@ -17,8 +17,6 @@
  * under the License.
  */
 
-var Guacamole = Guacamole || {};
-
 /**
  * Abstract ordered drawing surface. Each Layer contains a canvas element and
  * provides simple drawing instructions for drawing to that canvas element,
@@ -36,13 +34,13 @@ var Guacamole = Guacamole || {};
  *     The height of the Layer, in pixels. The canvas element backing this
  *     Layer will be given this height.
  */
-Guacamole.Layer = function(width, height) {
+function Layer(width, height) {
 
     /**
      * Reference to this Layer.
      *
      * @private
-     * @type {!Guacamole.Layer}
+     * @type {!Layer}
      */
     var layer = this;
 
@@ -361,7 +359,7 @@ Guacamole.Layer = function(width, height) {
      * Transfer a rectangle of image data from one Layer to this Layer using the
      * specified transfer function.
      * 
-     * @param {!Guacamole.Layer} srcLayer
+     * @param {!Layer} srcLayer
      *     The Layer to copy image data from.
      *
      * @param {!number} srcx
@@ -417,7 +415,7 @@ Guacamole.Layer = function(width, height) {
         for (var i=0; i<srcw*srch*4; i+=4) {
 
             // Get source pixel environment
-            var src_pixel = new Guacamole.Layer.Pixel(
+            var src_pixel = new Layer.Pixel(
                 src.data[i],
                 src.data[i+1],
                 src.data[i+2],
@@ -425,7 +423,7 @@ Guacamole.Layer = function(width, height) {
             );
                 
             // Get destination pixel environment
-            var dst_pixel = new Guacamole.Layer.Pixel(
+            var dst_pixel = new Layer.Pixel(
                 dst.data[i],
                 dst.data[i+1],
                 dst.data[i+2],
@@ -453,7 +451,7 @@ Guacamole.Layer = function(width, height) {
      * Put a rectangle of image data from one Layer to this Layer directly
      * without performing any alpha blending. Simply copy the data.
      * 
-     * @param {!Guacamole.Layer} srcLayer
+     * @param {!Layer} srcLayer
      *     The Layer to copy image data from.
      *
      * @param {!number} srcx
@@ -511,7 +509,7 @@ Guacamole.Layer = function(width, height) {
      * function was called are complete. This operation will not alter the
      * size of the source Layer even if its autosize property is set to true.
      * 
-     * @param {!Guacamole.Layer} srcLayer
+     * @param {!Layer} srcLayer
      *     The Layer to copy image data from.
      *
      * @param {!number} srcx
@@ -814,7 +812,7 @@ Guacamole.Layer = function(width, height) {
      * @param {!number} thickness
      *     The line thickness in pixels.
      *
-     * @param {!Guacamole.Layer} srcLayer
+     * @param {!Layer} srcLayer
      *     The layer to use as a repeating pattern within the stroke.
      */
     this.strokeLayer = function(cap, join, thickness, srcLayer) {
@@ -842,7 +840,7 @@ Guacamole.Layer = function(width, height) {
      * for other operations (such as clip()) but a new path will be started
      * once a path drawing operation (path() or rect()) is used.
      * 
-     * @param {!Guacamole.Layer} srcLayer
+     * @param {!Layer} srcLayer
      *     The layer to use as a repeating pattern within the fill.
      */
     this.fillLayer = function(srcLayer) {
@@ -1010,42 +1008,42 @@ Guacamole.Layer = function(width, height) {
  *
  * @type {!number}
  */
-Guacamole.Layer.ROUT  = 0x2;
+Layer.ROUT  = 0x2;
 
 /**
  * Channel mask for the composite operation "atop".
  *
  * @type {!number}
  */
-Guacamole.Layer.ATOP  = 0x6;
+Layer.ATOP  = 0x6;
 
 /**
  * Channel mask for the composite operation "xor".
  *
  * @type {!number}
  */
-Guacamole.Layer.XOR   = 0xA;
+Layer.XOR   = 0xA;
 
 /**
  * Channel mask for the composite operation "rover".
  *
  * @type {!number}
  */
-Guacamole.Layer.ROVER = 0xB;
+Layer.ROVER = 0xB;
 
 /**
  * Channel mask for the composite operation "over".
  *
  * @type {!number}
  */
-Guacamole.Layer.OVER  = 0xE;
+Layer.OVER  = 0xE;
 
 /**
  * Channel mask for the composite operation "plus".
  *
  * @type {!number}
  */
-Guacamole.Layer.PLUS  = 0xF;
+Layer.PLUS  = 0xF;
 
 /**
  * Channel mask for the composite operation "rin".
@@ -1055,7 +1053,7 @@ Guacamole.Layer.PLUS  = 0xF;
  *
  * @type {!number}
  */
-Guacamole.Layer.RIN   = 0x1;
+Layer.RIN   = 0x1;
 
 /**
  * Channel mask for the composite operation "in".
@@ -1065,7 +1063,7 @@ Guacamole.Layer.RIN   = 0x1;
  *
  * @type {!number}
  */
-Guacamole.Layer.IN    = 0x4;
+Layer.IN    = 0x4;
 
 /**
  * Channel mask for the composite operation "out".
@@ -1075,7 +1073,7 @@ Guacamole.Layer.IN    = 0x4;
  *
  * @type {!number}
  */
-Guacamole.Layer.OUT   = 0x8;
+Layer.OUT   = 0x8;
 
 /**
  * Channel mask for the composite operation "ratop".
@@ -1085,7 +1083,7 @@ Guacamole.Layer.OUT   = 0x8;
  *
  * @type {!number}
  */
-Guacamole.Layer.RATOP = 0x9;
+Layer.RATOP = 0x9;
 
 /**
  * Channel mask for the composite operation "src".
@@ -1095,7 +1093,7 @@ Guacamole.Layer.RATOP = 0x9;
  *
  * @type {!number}
  */
-Guacamole.Layer.SRC   = 0xC;
+Layer.SRC   = 0xC;
 
 /**
  * Represents a single pixel of image data. All components have a minimum value
@@ -1115,7 +1113,7 @@ Guacamole.Layer.SRC   = 0xC;
  * @param {!number} a
  *     The alpha component of this pixel.
  */
-Guacamole.Layer.Pixel = function(r, g, b, a) {
+Layer.Pixel = function(r, g, b, a) {
 
     /**
      * The red component of this pixel, where 0 is the minimum value,
@@ -1150,3 +1148,5 @@ Guacamole.Layer.Pixel = function(r, g, b, a) {
     this.alpha = a;
 
 };
+
+export default Layer;

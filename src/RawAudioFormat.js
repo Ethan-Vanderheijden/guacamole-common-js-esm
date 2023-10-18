@@ -17,20 +17,18 @@
  * under the License.
  */
 
-var Guacamole = Guacamole || {};
-
 /**
  * A description of the format of raw PCM audio, such as that used by
- * Guacamole.RawAudioPlayer and Guacamole.RawAudioRecorder. This object
+ * RawAudioPlayer and RawAudioRecorder. This object
  * describes the number of bytes per sample, the number of channels, and the
  * overall sample rate.
  *
  * @constructor
- * @param {!(Guacamole.RawAudioFormat|object)} template
+ * @param {!(RawAudioFormat|object)} template
  *     The object whose properties should be copied into the corresponding
- *     properties of the new Guacamole.RawAudioFormat.
+ *     properties of the new RawAudioFormat.
  */
-Guacamole.RawAudioFormat = function RawAudioFormat(template) {
+function RawAudioFormat(template) {
 
     /**
      * The number of bytes in each sample of audio data. This value is
@@ -57,19 +55,19 @@ Guacamole.RawAudioFormat = function RawAudioFormat(template) {
 };
 
 /**
- * Parses the given mimetype, returning a new Guacamole.RawAudioFormat
+ * Parses the given mimetype, returning a new RawAudioFormat
  * which describes the type of raw audio data represented by that mimetype. If
  * the mimetype is not a supported raw audio data mimetype, null is returned.
  *
  * @param {!string} mimetype
  *     The audio mimetype to parse.
  *
- * @returns {Guacamole.RawAudioFormat}
- *     A new Guacamole.RawAudioFormat which describes the type of raw
+ * @returns {RawAudioFormat}
+ *     A new RawAudioFormat which describes the type of raw
  *     audio data represented by the given mimetype, or null if the given
  *     mimetype is not supported.
  */
-Guacamole.RawAudioFormat.parse = function parseFormat(mimetype) {
+RawAudioFormat.parse = function parseFormat(mimetype) {
 
     var bytesPerSample;
 
@@ -137,10 +135,12 @@ Guacamole.RawAudioFormat.parse = function parseFormat(mimetype) {
         return null;
 
     // Return parsed format details
-    return new Guacamole.RawAudioFormat({
+    return new RawAudioFormat({
         bytesPerSample : bytesPerSample,
         channels       : channels,
         rate           : rate
     });
 
 };
+
+export default RawAudioFormat;

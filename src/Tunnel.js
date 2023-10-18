@@ -17,18 +17,20 @@
  * under the License.
  */
 
-var Guacamole = Guacamole || {};
+import Status from './Status.js';
+import Parser from './Parser.js';
+import UTF8Parser from './UTF8Parser.js';
 
 /**
  * Core object providing abstract communication for Guacamole. This object
  * is a null implementation whose functions do nothing. Guacamole applications
- * should use {@link Guacamole.HTTPTunnel} instead, or implement their own tunnel based
+ * should use {@link HTTPTunnel} instead, or implement their own tunnel based
  * on this one.
  * 
  * @constructor
- * @see Guacamole.HTTPTunnel
+ * @see HTTPTunnel
  */
-Guacamole.Tunnel = function() {
+function Tunnel() {
 
     /**
      * Connect to the tunnel with the given optional data. This data is
@@ -95,8 +97,8 @@ Guacamole.Tunnel = function() {
      *     true if this tunnel is currently connected, false otherwise.
      */
     this.isConnected = function isConnected() {
-        return this.state === Guacamole.Tunnel.State.OPEN
-            || this.state === Guacamole.Tunnel.State.UNSTABLE;
+        return this.state === Tunnel.State.OPEN
+            || this.state === Tunnel.State.UNSTABLE;
     };
 
     /**
@@ -104,7 +106,7 @@ Guacamole.Tunnel = function() {
      * 
      * @type {!number}
      */
-    this.state = Guacamole.Tunnel.State.CLOSED;
+    this.state = Tunnel.State.CLOSED;
 
     /**
      * The maximum amount of time to wait for data to be received, in
@@ -147,7 +149,7 @@ Guacamole.Tunnel = function() {
      * Fired whenever an error is encountered by the tunnel.
      * 
      * @event
-     * @param {!Guacamole.Status} status
+     * @param {!Status} status
      *     A status object which describes the error.
      */
     this.onerror = null;
@@ -186,14 +188,14 @@ Guacamole.Tunnel = function() {
  * @constant
  * @type {!string}
  */
-Guacamole.Tunnel.INTERNAL_DATA_OPCODE = '';
+Tunnel.INTERNAL_DATA_OPCODE = '';
 
 /**
  * All possible tunnel states.
  *
  * @type {!Object.<string, number>}
  */
-Guacamole.Tunnel.State = {
+Tunnel.State = {
 
     /**
      * A connection is in pending. It is not yet known whether connection was
@@ -233,7 +235,7 @@ Guacamole.Tunnel.State = {
  * Guacamole Tunnel implemented over HTTP via XMLHttpRequest.
  * 
  * @constructor
- * @augments Guacamole.Tunnel
+ * @augments Tunnel
  *
  * @param {!string} tunnelURL
  *     The URL of the HTTP tunneling service.
@@ -248,13 +250,13 @@ Guacamole.Tunnel.State = {
  *     headers to be sent in tunnel requests. By default, no extra headers will
  *     be added.
  */
-Guacamole.HTTPTunnel = function(tunnelURL, crossDomain, extraTunnelHeaders) {
+function HTTPTunnel(tunnelURL, crossDomain, extraTunnelHeaders) {
 
     /**
      * Reference to this HTTP tunnel.
      *
      * @private
-     * @type {!Guacamole.HTTPTunnel}
+     * @type {!HTTPTunnel}
      */
     var tunnel = this;
 
@@ -372,17 +374,17 @@ Guacamole.HTTPTunnel = function(tunnelURL, crossDomain, extraTunnelHeaders) {
         window.clearTimeout(unstableTimeout);
 
         // Clear unstable status
-        if (tunnel.state === Guacamole.Tunnel.State.UNSTABLE)
-            tunnel.setState(Guacamole.Tunnel.State.OPEN);
+        if (tunnel.state === Tunnel.State.UNSTABLE)
+            tunnel.setState(Tunnel.State.OPEN);
 
         // Set new timeout for tracking overall connection timeout
         receive_timeout = window.setTimeout(function () {
-            close_tunnel(new Guacamole.Status(Guacamole.Status.Code.UPSTREAM_TIMEOUT, "Server timeout."));
+            close_tunnel(new Status(Status.Code.UPSTREAM_TIMEOUT, "Server timeout."));
         }, tunnel.receiveTimeout);
 
         // Set new timeout for tracking suspected connection instability
         unstableTimeout = window.setTimeout(function() {
-            tunnel.setState(Guacamole.Tunnel.State.UNSTABLE);
+            tunnel.setState(Tunnel.State.UNSTABLE);
         }, tunnel.unstableThreshold);
 
     };
@@ -393,7 +395,7 @@ Guacamole.HTTPTunnel = function(tunnelURL, crossDomain, extraTunnelHeaders) {
      * an error status.
      * 
      * @private
-     * @param {!Guacamole.Status} status
+     * @param {!Status} status
      *     The status causing the connection to close;
      */
     function close_tunnel(status) {
@@ -406,16 +408,16 @@ Guacamole.HTTPTunnel = function(tunnelURL, crossDomain, extraTunnelHeaders) {
         window.clearInterval(pingInterval);
 
         // Ignore if already closed
-        if (tunnel.state === Guacamole.Tunnel.State.CLOSED)
+        if (tunnel.state === Tunnel.State.CLOSED)
             return;
 
         // If connection closed abnormally, signal error.
-        if (status.code !== Guacamole.Status.Code.SUCCESS && tunnel.onerror) {
+        if (status.code !== Status.Code.SUCCESS && tunnel.onerror) {
 
             // Ignore RESOURCE_NOT_FOUND if we've already connected, as that
             // only signals end-of-stream for the HTTP tunnel.
-            if (tunnel.state === Guacamole.Tunnel.State.CONNECTING
-                    || status.code !== Guacamole.Status.Code.RESOURCE_NOT_FOUND)
+            if (tunnel.state === Tunnel.State.CONNECTING
+                    || status.code !== Status.Code.RESOURCE_NOT_FOUND)
                 tunnel.onerror(status);
 
         }
@@ -424,7 +426,7 @@ Guacamole.HTTPTunnel = function(tunnelURL, crossDomain, extraTunnelHeaders) {
         sendingMessages = false;
 
         // Mark as closed
-        tunnel.setState(Guacamole.Tunnel.State.CLOSED);
+        tunnel.setState(Tunnel.State.CLOSED);
 
     }
 
@@ -440,7 +442,7 @@ Guacamole.HTTPTunnel = function(tunnelURL, crossDomain, extraTunnelHeaders) {
             return;
 
         // Add message to buffer
-        outputMessageBuffer += Guacamole.Parser.toInstruction(arguments);
+        outputMessageBuffer += Parser.toInstruction(arguments);
 
         // Send if not currently sending
         if (!sendingMessages)
@@ -497,19 +499,19 @@ Guacamole.HTTPTunnel = function(tunnelURL, crossDomain, extraTunnelHeaders) {
         var code = parseInt(xmlhttprequest.getResponseHeader("Guacamole-Status-Code"));
         if (code) {
             var message = xmlhttprequest.getResponseHeader("Guacamole-Error-Message");
-            close_tunnel(new Guacamole.Status(code, message));
+            close_tunnel(new Status(code, message));
         }
 
         // Failing that, derive a Guacamole status code from the HTTP status
         // code provided by the browser
         else if (xmlhttprequest.status)
-            close_tunnel(new Guacamole.Status(
-                Guacamole.Status.Code.fromHTTPCode(xmlhttprequest.status),
+            close_tunnel(new Status(
+                Status.Code.fromHTTPCode(xmlhttprequest.status),
                     xmlhttprequest.statusText));
 
         // Otherwise, assume server is unreachable
         else
-            close_tunnel(new Guacamole.Status(Guacamole.Status.Code.UPSTREAM_NOT_FOUND));
+            close_tunnel(new Status(Status.Code.UPSTREAM_NOT_FOUND));
 
     }
 
@@ -520,15 +522,15 @@ Guacamole.HTTPTunnel = function(tunnelURL, crossDomain, extraTunnelHeaders) {
 
         var dataUpdateEvents = 0;
 
-        var parser = new Guacamole.Parser();
+        var parser = new Parser();
         parser.oninstruction = function instructionReceived(opcode, args) {
 
             // Switch to next request if end-of-stream is signalled
-            if (opcode === Guacamole.Tunnel.INTERNAL_DATA_OPCODE && args.length === 0) {
+            if (opcode === Tunnel.INTERNAL_DATA_OPCODE && args.length === 0) {
 
                 // Reset parser state by simply switching to an entirely new
                 // parser
-                parser = new Guacamole.Parser();
+                parser = new Parser();
                 parser.oninstruction = instructionReceived;
 
                 // Clean up interval if polling
@@ -546,7 +548,7 @@ Guacamole.HTTPTunnel = function(tunnelURL, crossDomain, extraTunnelHeaders) {
             }
 
             // Call instruction handler.
-            else if (opcode !== Guacamole.Tunnel.INTERNAL_DATA_OPCODE && tunnel.oninstruction)
+            else if (opcode !== Tunnel.INTERNAL_DATA_OPCODE && tunnel.oninstruction)
                 tunnel.oninstruction(opcode, args);
 
         };
@@ -614,7 +616,7 @@ Guacamole.HTTPTunnel = function(tunnelURL, crossDomain, extraTunnelHeaders) {
                     parser.receive(current, true);
                 }
                 catch (e) {
-                    close_tunnel(new Guacamole.Status(Guacamole.Status.Code.SERVER_ERROR, e.message));
+                    close_tunnel(new Status(Status.Code.SERVER_ERROR, e.message));
                     return;
                 }
 
@@ -675,7 +677,7 @@ Guacamole.HTTPTunnel = function(tunnelURL, crossDomain, extraTunnelHeaders) {
         resetTimers();
 
         // Mark the tunnel as connecting
-        tunnel.setState(Guacamole.Tunnel.State.CONNECTING);
+        tunnel.setState(Tunnel.State.CONNECTING);
 
         // Start tunnel and connect
         var connect_xmlhttprequest = new XMLHttpRequest();
@@ -698,12 +700,12 @@ Guacamole.HTTPTunnel = function(tunnelURL, crossDomain, extraTunnelHeaders) {
 
             // Fail connect attempt if token is not successfully assigned
             if (!tunnelSessionToken) {
-                close_tunnel(new Guacamole.Status(Guacamole.Status.Code.UPSTREAM_NOT_FOUND));
+                close_tunnel(new Status(Status.Code.UPSTREAM_NOT_FOUND));
                 return;
             }
 
             // Mark as open
-            tunnel.setState(Guacamole.Tunnel.State.OPEN);
+            tunnel.setState(Tunnel.State.OPEN);
 
             // Ping tunnel endpoint regularly to test connection stability
             pingInterval = setInterval(function sendPing() {
@@ -724,28 +726,28 @@ Guacamole.HTTPTunnel = function(tunnelURL, crossDomain, extraTunnelHeaders) {
     };
 
     this.disconnect = function() {
-        close_tunnel(new Guacamole.Status(Guacamole.Status.Code.SUCCESS, "Manually closed."));
+        close_tunnel(new Status(Status.Code.SUCCESS, "Manually closed."));
     };
 
 };
 
-Guacamole.HTTPTunnel.prototype = new Guacamole.Tunnel();
+HTTPTunnel.prototype = new Tunnel();
 
 /**
  * Guacamole Tunnel implemented over WebSocket via XMLHttpRequest.
  * 
  * @constructor
- * @augments Guacamole.Tunnel
+ * @augments Tunnel
  * @param {!string} tunnelURL
  *     The URL of the WebSocket tunneling service.
  */
-Guacamole.WebSocketTunnel = function(tunnelURL) {
+function WebSocketTunnel(tunnelURL) {
 
     /**
      * Reference to this WebSocket tunnel.
      *
      * @private
-     * @type {Guacamole.WebSocketTunnel}
+     * @type {WebSocketTunnel}
      */
     var tunnel = this;
 
@@ -755,7 +757,7 @@ Guacamole.WebSocketTunnel = function(tunnelURL) {
      * Initially, this will be null.
      *
      * @private
-     * @type {Guacamole.Parser}
+     * @type {Parser}
      */
     var parser = null;
 
@@ -867,7 +869,7 @@ Guacamole.WebSocketTunnel = function(tunnelURL) {
      */
     var sendPing = function sendPing() {
         var currentTime = new Date().getTime();
-        tunnel.sendMessage(Guacamole.Tunnel.INTERNAL_DATA_OPCODE, 'ping', currentTime);
+        tunnel.sendMessage(Tunnel.INTERNAL_DATA_OPCODE, 'ping', currentTime);
         lastSentPing = currentTime;
     };
 
@@ -889,17 +891,17 @@ Guacamole.WebSocketTunnel = function(tunnelURL) {
         window.clearTimeout(pingTimeout);
 
         // Clear unstable status
-        if (tunnel.state === Guacamole.Tunnel.State.UNSTABLE)
-            tunnel.setState(Guacamole.Tunnel.State.OPEN);
+        if (tunnel.state === Tunnel.State.UNSTABLE)
+            tunnel.setState(Tunnel.State.OPEN);
 
         // Set new timeout for tracking overall connection timeout
         receive_timeout = window.setTimeout(function () {
-            close_tunnel(new Guacamole.Status(Guacamole.Status.Code.UPSTREAM_TIMEOUT, "Server timeout."));
+            close_tunnel(new Status(Status.Code.UPSTREAM_TIMEOUT, "Server timeout."));
         }, tunnel.receiveTimeout);
 
         // Set new timeout for tracking suspected connection instability
         unstableTimeout = window.setTimeout(function() {
-            tunnel.setState(Guacamole.Tunnel.State.UNSTABLE);
+            tunnel.setState(Tunnel.State.UNSTABLE);
         }, tunnel.unstableThreshold);
 
         var currentTime = new Date().getTime();
@@ -920,7 +922,7 @@ Guacamole.WebSocketTunnel = function(tunnelURL) {
      * an error status.
      * 
      * @private
-     * @param {!Guacamole.Status} status
+     * @param {!Status} status
      *     The status causing the connection to close;
      */
     function close_tunnel(status) {
@@ -931,15 +933,15 @@ Guacamole.WebSocketTunnel = function(tunnelURL) {
         window.clearTimeout(pingTimeout);
 
         // Ignore if already closed
-        if (tunnel.state === Guacamole.Tunnel.State.CLOSED)
+        if (tunnel.state === Tunnel.State.CLOSED)
             return;
 
         // If connection closed abnormally, signal error.
-        if (status.code !== Guacamole.Status.Code.SUCCESS && tunnel.onerror)
+        if (status.code !== Status.Code.SUCCESS && tunnel.onerror)
             tunnel.onerror(status);
 
         // Mark as closed
-        tunnel.setState(Guacamole.Tunnel.State.CLOSED);
+        tunnel.setState(Tunnel.State.CLOSED);
 
         socket.close();
 
@@ -955,7 +957,7 @@ Guacamole.WebSocketTunnel = function(tunnelURL) {
         if (!arguments.length)
             return;
 
-        socket.send(Guacamole.Parser.toInstruction(arguments));
+        socket.send(Parser.toInstruction(arguments));
 
     };
 
@@ -964,25 +966,25 @@ Guacamole.WebSocketTunnel = function(tunnelURL) {
         resetTimers();
 
         // Mark the tunnel as connecting
-        tunnel.setState(Guacamole.Tunnel.State.CONNECTING);
+        tunnel.setState(Tunnel.State.CONNECTING);
 
-        parser = new Guacamole.Parser();
+        parser = new Parser();
         parser.oninstruction = function instructionReceived(opcode, args) {
 
             // Update state and UUID when first instruction received
             if (tunnel.uuid === null) {
 
                 // Associate tunnel UUID if received
-                if (opcode === Guacamole.Tunnel.INTERNAL_DATA_OPCODE && args.length === 1)
+                if (opcode === Tunnel.INTERNAL_DATA_OPCODE && args.length === 1)
                     tunnel.setUUID(args[0]);
 
                 // Tunnel is now open and UUID is available
-                tunnel.setState(Guacamole.Tunnel.State.OPEN);
+                tunnel.setState(Tunnel.State.OPEN);
 
             }
 
             // Call instruction handler.
-            if (opcode !== Guacamole.Tunnel.INTERNAL_DATA_OPCODE && tunnel.oninstruction)
+            if (opcode !== Tunnel.INTERNAL_DATA_OPCODE && tunnel.oninstruction)
                 tunnel.oninstruction(opcode, args);
 
         };
@@ -998,16 +1000,16 @@ Guacamole.WebSocketTunnel = function(tunnelURL) {
 
             // Pull status code directly from closure reason provided by Guacamole
             if (event.reason)
-                close_tunnel(new Guacamole.Status(parseInt(event.reason), event.reason));
+                close_tunnel(new Status(parseInt(event.reason), event.reason));
 
             // Failing that, derive a Guacamole status code from the WebSocket
             // status code provided by the browser
             else if (event.code)
-                close_tunnel(new Guacamole.Status(Guacamole.Status.Code.fromWebSocketCode(event.code)));
+                close_tunnel(new Status(Status.Code.fromWebSocketCode(event.code)));
 
             // Otherwise, assume server is unreachable
             else
-                close_tunnel(new Guacamole.Status(Guacamole.Status.Code.UPSTREAM_NOT_FOUND));
+                close_tunnel(new Status(Status.Code.UPSTREAM_NOT_FOUND));
 
         };
         
@@ -1019,7 +1021,7 @@ Guacamole.WebSocketTunnel = function(tunnelURL) {
                 parser.receive(event.data);
             }
             catch (e) {
-                close_tunnel(new Guacamole.Status(Guacamole.Status.Code.SERVER_ERROR, e.message));
+                close_tunnel(new Status(Status.Code.SERVER_ERROR, e.message));
             }
 
         };
@@ -1027,12 +1029,12 @@ Guacamole.WebSocketTunnel = function(tunnelURL) {
     };
 
     this.disconnect = function() {
-        close_tunnel(new Guacamole.Status(Guacamole.Status.Code.SUCCESS, "Manually closed."));
+        close_tunnel(new Status(Status.Code.SUCCESS, "Manually closed."));
     };
 
 };
 
-Guacamole.WebSocketTunnel.prototype = new Guacamole.Tunnel();
+WebSocketTunnel.prototype = new Tunnel();
 
 /**
  * Guacamole Tunnel which cycles between all specified tunnels until
@@ -1042,11 +1044,11 @@ Guacamole.WebSocketTunnel.prototype = new Guacamole.Tunnel();
  * through the onerror handler (if defined).
  * 
  * @constructor
- * @augments Guacamole.Tunnel
- * @param {...Guacamole.Tunnel} tunnelChain
+ * @augments Tunnel
+ * @param {...Tunnel} tunnelChain
  *     The tunnels to use, in order of priority.
  */
-Guacamole.ChainedTunnel = function(tunnelChain) {
+function ChainedTunnel(tunnelChain) {
 
     /**
      * Reference to this chained tunnel.
@@ -1073,7 +1075,7 @@ Guacamole.ChainedTunnel = function(tunnelChain) {
      * has yet been committed.
      *
      * @private
-     * @type {Guacamole.Tunnel}
+     * @type {Tunnel}
      */
     var committedTunnel = null;
 
@@ -1085,7 +1087,7 @@ Guacamole.ChainedTunnel = function(tunnelChain) {
      * Sets the current tunnel.
      * 
      * @private
-     * @param {!Guacamole.Tunnel} tunnel
+     * @param {!Tunnel} tunnel
      *     The tunnel to set as the current tunnel.
      */
     function attach(tunnel) {
@@ -1099,18 +1101,18 @@ Guacamole.ChainedTunnel = function(tunnelChain) {
          * possible.
          *
          * @private
-         * @param {Guacamole.Status} [status]
+         * @param {Status} [status]
          *     An object representing the failure that occured in the
          *     currently-attached tunnel, if known.
          *
-         * @return {Guacamole.Tunnel}
+         * @return {Tunnel}
          *     The next tunnel, or null if there are no more tunnels to try or
          *     if no more tunnels should be tried.
          */
         var failTunnel = function failTunnel(status) {
 
             // Do not attempt to continue using next tunnel on server timeout
-            if (status && status.code === Guacamole.Status.Code.UPSTREAM_TIMEOUT) {
+            if (status && status.code === Status.Code.UPSTREAM_TIMEOUT) {
                 tunnels = [];
                 return null;
             }
@@ -1162,14 +1164,14 @@ Guacamole.ChainedTunnel = function(tunnelChain) {
             switch (state) {
 
                 // If open, use this tunnel from this point forward.
-                case Guacamole.Tunnel.State.OPEN:
+                case Tunnel.State.OPEN:
                     commit_tunnel();
                     if (chained_tunnel.onstatechange)
                         chained_tunnel.onstatechange(state);
                     break;
 
                 // If closed, mark failure, attempt next tunnel
-                case Guacamole.Tunnel.State.CLOSED:
+                case Tunnel.State.CLOSED:
                     if (!failTunnel() && chained_tunnel.onstatechange)
                         chained_tunnel.onstatechange(state);
                     break;
@@ -1218,13 +1220,13 @@ Guacamole.ChainedTunnel = function(tunnelChain) {
 
         // If there IS no first tunnel, error
         else if (chained_tunnel.onerror)
-            chained_tunnel.onerror(Guacamole.Status.Code.SERVER_ERROR, "No tunnels to try.");
+            chained_tunnel.onerror(Status.Code.SERVER_ERROR, "No tunnels to try.");
 
     };
     
 };
 
-Guacamole.ChainedTunnel.prototype = new Guacamole.Tunnel();
+ChainedTunnel.prototype = new Tunnel();
 
 /**
  * Guacamole Tunnel which replays a Guacamole protocol dump from a static file
@@ -1232,7 +1234,7 @@ Guacamole.ChainedTunnel.prototype = new Guacamole.Tunnel();
  * quickly as possible, while the file is being downloaded.
  *
  * @constructor
- * @augments Guacamole.Tunnel
+ * @augments Tunnel
  * @param {!string} url
  *     The URL of a Guacamole protocol dump.
  *
@@ -1246,10 +1248,10 @@ Guacamole.ChainedTunnel.prototype = new Guacamole.Tunnel();
  *     headers to be sent in tunnel requests. By default, no extra headers will
  *     be added.
  */
-Guacamole.StaticHTTPTunnel = function StaticHTTPTunnel(url, crossDomain, extraTunnelHeaders) {
+function StaticHTTPTunnel(url, crossDomain, extraTunnelHeaders) {
 
     /**
-     * Reference to this Guacamole.StaticHTTPTunnel.
+     * Reference to this StaticHTTPTunnel.
      *
      * @private
      */
@@ -1293,12 +1295,12 @@ Guacamole.StaticHTTPTunnel = function StaticHTTPTunnel(url, crossDomain, extraTu
         tunnel.disconnect();
 
         // Connection is now starting
-        tunnel.setState(Guacamole.Tunnel.State.CONNECTING);
+        tunnel.setState(Tunnel.State.CONNECTING);
 
         // Create Guacamole protocol and UTF-8 parsers specifically for this
         // connection
-        var parser = new Guacamole.Parser();
-        var utf8Parser = new Guacamole.UTF8Parser();
+        var parser = new Parser();
+        var utf8Parser = new UTF8Parser();
 
         // Invoke tunnel's oninstruction handler for each parsed instruction
         parser.oninstruction = function instructionReceived(opcode, args) {
@@ -1321,8 +1323,8 @@ Guacamole.StaticHTTPTunnel = function StaticHTTPTunnel(url, crossDomain, extraTu
             if (!response.ok) {
 
                 if (tunnel.onerror)
-                    tunnel.onerror(new Guacamole.Status(
-                        Guacamole.Status.Code.fromHTTPCode(response.status), response.statusText));
+                    tunnel.onerror(new Status(
+                        Status.Code.fromHTTPCode(response.status), response.statusText));
 
                 tunnel.disconnect();
                 return;
@@ -1333,7 +1335,7 @@ Guacamole.StaticHTTPTunnel = function StaticHTTPTunnel(url, crossDomain, extraTu
             tunnel.size = response.headers.get('Content-Length');
 
             // Connection is open
-            tunnel.setState(Guacamole.Tunnel.State.OPEN);
+            tunnel.setState(Tunnel.State.OPEN);
 
             var reader = response.body.getReader();
             var processReceivedText = function processReceivedText(result) {
@@ -1368,10 +1370,18 @@ Guacamole.StaticHTTPTunnel = function StaticHTTPTunnel(url, crossDomain, extraTu
         }
 
         // Connection is now closed
-        tunnel.setState(Guacamole.Tunnel.State.CLOSED);
+        tunnel.setState(Tunnel.State.CLOSED);
 
     };
 
 };
 
-Guacamole.StaticHTTPTunnel.prototype = new Guacamole.Tunnel();
+StaticHTTPTunnel.prototype = new Tunnel();
+
+export {
+    Tunnel,
+    HTTPTunnel,
+    WebSocketTunnel,
+    ChainedTunnel,
+    StaticHTTPTunnel,
+}

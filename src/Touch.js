@@ -17,28 +17,29 @@
  * under the License.
  */
 
-var Guacamole = Guacamole || {};
+import Event from './Event.js';
+import Position from './Position.js';
 
 /**
  * Provides cross-browser multi-touch events for a given element. The events of
  * the given element are automatically populated with handlers that translate
  * touch events into a non-browser-specific event provided by the
- * Guacamole.Touch instance.
+ * Touch instance.
  * 
  * @constructor
- * @augments Guacamole.Event.Target
+ * @augments Event.Target
  * @param {!Element} element
  *     The Element to use to provide touch events.
  */
-Guacamole.Touch = function Touch(element) {
+function Touch(element) {
 
-    Guacamole.Event.Target.call(this);
+    Event.Target.call(this);
 
     /**
-     * Reference to this Guacamole.Touch.
+     * Reference to this Touch.
      *
      * @private
-     * @type {!Guacamole.Touch}
+     * @type {!Touch}
      */
     var guacTouch = this;
 
@@ -55,43 +56,43 @@ Guacamole.Touch = function Touch(element) {
     /**
      * The set of all active touches, stored by their unique identifiers.
      *
-     * @type {!Object.<Number, Guacamole.Touch.State>}
+     * @type {!Object.<Number, Touch.State>}
      */
     this.touches = {};
 
     /**
      * The number of active touches currently stored within
-     * {@link Guacamole.Touch#touches touches}.
+     * {@link Touch#touches touches}.
      */
     this.activeTouches = 0;
 
     /**
      * Fired whenever a new touch contact is initiated on the element
-     * associated with this Guacamole.Touch.
+     * associated with this Touch.
      * 
-     * @event Guacamole.Touch#touchstart
-     * @param {!Guacamole.Touch.Event} event
-     *     A {@link Guacamole.Touch.Event} object representing the "touchstart"
+     * @event Touch#touchstart
+     * @param {!Touch.Event} event
+     *     A {@link Touch.Event} object representing the "touchstart"
      *     event.
      */
 
     /**
      * Fired whenever an established touch contact moves within the element
-     * associated with this Guacamole.Touch.
+     * associated with this Touch.
      * 
-     * @event Guacamole.Touch#touchmove
-     * @param {!Guacamole.Touch.Event} event
-     *     A {@link Guacamole.Touch.Event} object representing the "touchmove"
+     * @event Touch#touchmove
+     * @param {!Touch.Event} event
+     *     A {@link Touch.Event} object representing the "touchmove"
      *     event.
      */
 
     /**
      * Fired whenever an established touch contact is lifted from the element
-     * associated with this Guacamole.Touch.
+     * associated with this Touch.
      * 
-     * @event Guacamole.Touch#touchend
-     * @param {!Guacamole.Touch.Event} event
-     *     A {@link Guacamole.Touch.Event} object representing the "touchend"
+     * @event Touch#touchend
+     * @param {!Touch.Event} event
+     *     A {@link Touch.Event} object representing the "touchend"
      *     event.
      */
 
@@ -107,7 +108,7 @@ Guacamole.Touch = function Touch(element) {
             if (guacTouch.touches[identifier])
                 continue;
 
-            var touch = guacTouch.touches[identifier] = new Guacamole.Touch.State({
+            var touch = guacTouch.touches[identifier] = new Touch.State({
                 id      : identifier,
                 radiusX : changedTouch.radiusX || DEFAULT_CONTACT_RADIUS,
                 radiusY : changedTouch.radiusY || DEFAULT_CONTACT_RADIUS,
@@ -118,7 +119,7 @@ Guacamole.Touch = function Touch(element) {
             guacTouch.activeTouches++;
 
             touch.fromClientPosition(element, changedTouch.clientX, changedTouch.clientY);
-            guacTouch.dispatch(new Guacamole.Touch.Event('touchmove', e, touch));
+            guacTouch.dispatch(new Touch.Event('touchmove', e, touch));
 
         }
 
@@ -149,7 +150,7 @@ Guacamole.Touch = function Touch(element) {
 
             // Update with any change in position
             touch.fromClientPosition(element, changedTouch.clientX, changedTouch.clientY);
-            guacTouch.dispatch(new Guacamole.Touch.Event('touchmove', e, touch));
+            guacTouch.dispatch(new Touch.Event('touchmove', e, touch));
 
         }
 
@@ -177,7 +178,7 @@ Guacamole.Touch = function Touch(element) {
 
             // Update with final position
             touch.fromClientPosition(element, changedTouch.clientX, changedTouch.clientY);
-            guacTouch.dispatch(new Guacamole.Touch.Event('touchend', e, touch));
+            guacTouch.dispatch(new Touch.Event('touchend', e, touch));
 
         }
 
@@ -189,16 +190,16 @@ Guacamole.Touch = function Touch(element) {
  * The current state of a touch contact.
  *
  * @constructor
- * @augments Guacamole.Position
- * @param {Guacamole.Touch.State|object} [template={}]
+ * @augments Position
+ * @param {Touch.State|object} [template={}]
  *     The object whose properties should be copied within the new
- *     Guacamole.Touch.State.
+ *     Touch.State.
  */
-Guacamole.Touch.State = function State(template) {
+Touch.State = function State(template) {
 
     template = template || {};
 
-    Guacamole.Position.call(this, template);
+    Position.call(this, template);
 
     /**
      * An arbitrary integer ID which uniquely identifies this contact relative
@@ -255,26 +256,28 @@ Guacamole.Touch.State = function State(template) {
  * own event.
  *
  * @constructor
- * @augments Guacamole.Event.DOMEvent
+ * @augments Event.DOMEvent
  * @param {!string} type
  *     The name of the touch event type. Possible values are "touchstart",
  *     "touchmove", and "touchend".
  *
  * @param {!TouchEvent} event
- *     The DOM touch event that produced this Guacamole.Touch.Event.
+ *     The DOM touch event that produced this Touch.Event.
  *
- * @param {!Guacamole.Touch.State} state
+ * @param {!Touch.State} state
  *     The state of the touch contact associated with this event.
  */
-Guacamole.Touch.Event = function TouchEvent(type, event, state) {
+Touch.Event = function TouchEvent(type, event, state) {
 
-    Guacamole.Event.DOMEvent.call(this, type, [ event ]);
+    Event.DOMEvent.call(this, type, [ event ]);
 
     /**
      * The state of the touch contact associated with this event.
      *
-     * @type {!Guacamole.Touch.State}
+     * @type {!Touch.State}
      */
     this.state = state;
 
 };
+
+export default Touch;

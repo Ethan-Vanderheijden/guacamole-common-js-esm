@@ -17,8 +17,6 @@
  * under the License.
  */
 
-var Guacamole = Guacamole || {};
-
 /**
  * An object that will accept raw key events and produce a chronologically
  * ordered array of key event objects. These events can be obtained by
@@ -30,7 +28,7 @@ var Guacamole = Guacamole || {};
  *     the timestamp of each intepreted event will be relative to this timestamp.
  *     If not provided, the raw recording timestamp will be used.
  */
-Guacamole.KeyEventInterpreter = function KeyEventInterpreter(startTimestamp) {
+function KeyEventInterpreter(startTimestamp) {
 
     // Default to 0 seconds to keep the raw timestamps
     if (startTimestamp === undefined || startTimestamp === null)
@@ -144,7 +142,7 @@ Guacamole.KeyEventInterpreter = function KeyEventInterpreter(startTimestamp) {
 
         // Construct a map of keysym to KeyDefinition object
         KNOWN_KEYS[keyDefinition.keysym] = (
-                new Guacamole.KeyEventInterpreter.KeyDefinition(keyDefinition));
+                new KeyEventInterpreter.KeyDefinition(keyDefinition));
 
     });
 
@@ -152,7 +150,7 @@ Guacamole.KeyEventInterpreter = function KeyEventInterpreter(startTimestamp) {
      * All key events parsed as of the most recent handleKeyEvent() invocation.
      *
      * @private
-     * @type {!Guacamole.KeyEventInterpreter.KeyEvent[]}
+     * @type {!KeyEventInterpreter.KeyEvent[]}
      */
     var parsedEvents = [];
 
@@ -164,7 +162,7 @@ Guacamole.KeyEventInterpreter = function KeyEventInterpreter(startTimestamp) {
      * @param {Number} keysym
      *     The keysym to produce a UTF-8 KeyDefinition for, if valid.
      *
-     * @returns {Guacamole.KeyEventInterpreter.KeyDefinition}
+     * @returns {KeyEventInterpreter.KeyDefinition}
      *     A KeyDefinition for the provided keysym, if it's a valid UTF-8
      *     keysym, or null otherwise.
      */
@@ -179,7 +177,7 @@ Guacamole.KeyEventInterpreter = function KeyEventInterpreter(startTimestamp) {
         var name = String.fromCharCode(codepoint);
 
         // Create and return the definition
-        return new Guacamole.KeyEventInterpreter.KeyDefinition({
+        return new KeyEventInterpreter.KeyDefinition({
                 keysym: keysym, name: name, value: name});
 
     }
@@ -207,7 +205,7 @@ Guacamole.KeyEventInterpreter = function KeyEventInterpreter(startTimestamp) {
 
         // If it's not UTF-8, return an unknown definition, with the name
         // just set to the hex value of the keysym
-        return new Guacamole.KeyEventInterpreter.KeyDefinition({
+        return new KeyEventInterpreter.KeyDefinition({
             keysym: keysym,
             name: '0x' + String(keysym.toString(16))
         })
@@ -239,7 +237,7 @@ Guacamole.KeyEventInterpreter = function KeyEventInterpreter(startTimestamp) {
         var definition = getKeyDefinitionByKeysym(keysym);
 
         // Push the latest parsed event into the list
-        parsedEvents.push(new Guacamole.KeyEventInterpreter.KeyEvent({
+        parsedEvents.push(new KeyEventInterpreter.KeyEvent({
             definition: definition,
             pressed: pressed,
             timestamp: relativeTimestap
@@ -252,7 +250,7 @@ Guacamole.KeyEventInterpreter = function KeyEventInterpreter(startTimestamp) {
      * incomplete, as more key events might be processed before the next
      * batch starts.
      *
-     * @returns {Guacamole.KeyEventInterpreter.KeyEvent[]}
+     * @returns {KeyEventInterpreter.KeyEvent[]}
      *     The current batch of text.
      */
     this.getEvents = function getEvents() {
@@ -265,11 +263,11 @@ Guacamole.KeyEventInterpreter = function KeyEventInterpreter(startTimestamp) {
  * A definition for a known key.
  *
  * @constructor
- * @param {Guacamole.KeyEventInterpreter.KeyDefinition|object} [template={}]
+ * @param {KeyEventInterpreter.KeyDefinition|object} [template={}]
  *     The object whose properties should be copied within the new
  *     KeyDefinition.
  */
-Guacamole.KeyEventInterpreter.KeyDefinition = function KeyDefinition(template) {
+KeyEventInterpreter.KeyDefinition = function KeyDefinition(template) {
 
     // Use empty object by default
     template = template || {};
@@ -301,11 +299,11 @@ Guacamole.KeyEventInterpreter.KeyDefinition = function KeyDefinition(template) {
  * and the timestamp when the event occured.
  *
  * @constructor
- * @param {Guacamole.KeyEventInterpreter.KeyEvent|object} [template={}]
+ * @param {KeyEventInterpreter.KeyEvent|object} [template={}]
  *     The object whose properties should be copied within the new
  *     KeyEvent.
  */
-Guacamole.KeyEventInterpreter.KeyEvent = function KeyEvent(template) {
+KeyEventInterpreter.KeyEvent = function KeyEvent(template) {
 
     // Use empty object by default
     template = template || {};
@@ -313,7 +311,7 @@ Guacamole.KeyEventInterpreter.KeyEvent = function KeyEvent(template) {
     /**
      * The key definition for the pressed key.
      *
-     * @type {!Guacamole.KeyEventInterpreter.KeyDefinition}
+     * @type {!KeyEventInterpreter.KeyDefinition}
      */
     this.definition = template.definition;
 
@@ -333,3 +331,5 @@ Guacamole.KeyEventInterpreter.KeyEvent = function KeyEvent(template) {
     this.timestamp = template.timestamp;
 
 };
+
+export default KeyEventInterpreter;

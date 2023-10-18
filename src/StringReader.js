@@ -17,41 +17,42 @@
  * under the License.
  */
 
-var Guacamole = Guacamole || {};
+import ArrayBufferReader from './ArrayBufferReader.js';
+import UTF8Parser from './UTF8Parser.js';
 
 /**
  * A reader which automatically handles the given input stream, returning
  * strictly text data. Note that this object will overwrite any installed event
- * handlers on the given Guacamole.InputStream.
+ * handlers on the given InputStream.
  * 
  * @constructor
- * @param {!Guacamole.InputStream} stream
+ * @param {!InputStream} stream
  *     The stream that data will be read from.
  */
-Guacamole.StringReader = function(stream) {
+export default function(stream) {
 
     /**
-     * Reference to this Guacamole.InputStream.
+     * Reference to this InputStream.
      *
      * @private
-     * @type {!Guacamole.StringReader}
+     * @type {!StringReader}
      */
     var guac_reader = this;
 
     /**
      * Parser for received UTF-8 data.
      *
-     * @type {!Guacamole.UTF8Parser}
+     * @type {!UTF8Parser}
      */
-    var utf8Parser = new Guacamole.UTF8Parser();
+    var utf8Parser = new UTF8Parser();
 
     /**
-     * Wrapped Guacamole.ArrayBufferReader.
+     * Wrapped ArrayBufferReader.
      *
      * @private
-     * @type {!Guacamole.ArrayBufferReader}
+     * @type {!ArrayBufferReader}
      */
-    var array_reader = new Guacamole.ArrayBufferReader(stream);
+    var array_reader = new ArrayBufferReader(stream);
 
     // Receive blobs as strings
     array_reader.ondata = function(buffer) {

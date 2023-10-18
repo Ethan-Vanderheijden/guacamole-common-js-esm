@@ -17,20 +17,23 @@
  * under the License.
  */
 
-var Guacamole = Guacamole || {};
+import InputStream from './InputStream.js';
+import ArrayBufferReader from './ArrayBufferReader.js';
+import AudioContextFactory from './AudioContextFactory.js';
+import RawAudioFormat from './RawAudioFormat.js';
 
 /**
  * Abstract audio player which accepts, queues and plays back arbitrary audio
  * data. It is up to implementations of this class to provide some means of
- * handling a provided Guacamole.InputStream. Data received along the provided
+ * handling a provided InputStream. Data received along the provided
  * stream is to be played back immediately.
  *
  * @constructor
  */
-Guacamole.AudioPlayer = function AudioPlayer() {
+function AudioPlayer() {
 
     /**
-     * Notifies this Guacamole.AudioPlayer that all audio up to the current
+     * Notifies this AudioPlayer that all audio up to the current
      * point in time has been given via the underlying stream, and that any
      * difference in time between queued audio data and the current time can be
      * considered latency.
@@ -43,25 +46,25 @@ Guacamole.AudioPlayer = function AudioPlayer() {
 
 /**
  * Determines whether the given mimetype is supported by any built-in
- * implementation of Guacamole.AudioPlayer, and thus will be properly handled
- * by Guacamole.AudioPlayer.getInstance().
+ * implementation of AudioPlayer, and thus will be properly handled
+ * by AudioPlayer.getInstance().
  *
  * @param {!string} mimetype
  *     The mimetype to check.
  *
  * @returns {!boolean}
  *     true if the given mimetype is supported by any built-in
- *     Guacamole.AudioPlayer, false otherwise.
+ *     AudioPlayer, false otherwise.
  */
-Guacamole.AudioPlayer.isSupportedType = function isSupportedType(mimetype) {
+AudioPlayer.isSupportedType = function isSupportedType(mimetype) {
 
-    return Guacamole.RawAudioPlayer.isSupportedType(mimetype);
+    return RawAudioPlayer.isSupportedType(mimetype);
 
 };
 
 /**
  * Returns a list of all mimetypes supported by any built-in
- * Guacamole.AudioPlayer, in rough order of priority. Beware that only the core
+ * AudioPlayer, in rough order of priority. Beware that only the core
  * mimetypes themselves will be listed. Any mimetype parameters, even required
  * ones, will not be included in the list. For example, "audio/L8" is a
  * supported raw audio mimetype that is supported, but it is invalid without
@@ -69,36 +72,36 @@ Guacamole.AudioPlayer.isSupportedType = function isSupportedType(mimetype) {
  * however (see https://tools.ietf.org/html/rfc4856).
  *
  * @returns {!string[]}
- *     A list of all mimetypes supported by any built-in Guacamole.AudioPlayer,
+ *     A list of all mimetypes supported by any built-in AudioPlayer,
  *     excluding any parameters.
  */
-Guacamole.AudioPlayer.getSupportedTypes = function getSupportedTypes() {
+AudioPlayer.getSupportedTypes = function getSupportedTypes() {
 
-    return Guacamole.RawAudioPlayer.getSupportedTypes();
+    return RawAudioPlayer.getSupportedTypes();
 
 };
 
 /**
- * Returns an instance of Guacamole.AudioPlayer providing support for the given
+ * Returns an instance of AudioPlayer providing support for the given
  * audio format. If support for the given audio format is not available, null
  * is returned.
  *
- * @param {!Guacamole.InputStream} stream
- *     The Guacamole.InputStream to read audio data from.
+ * @param {!InputStream} stream
+ *     The InputStream to read audio data from.
  *
  * @param {!string} mimetype
  *     The mimetype of the audio data in the provided stream.
  *
- * @return {Guacamole.AudioPlayer}
- *     A Guacamole.AudioPlayer instance supporting the given mimetype and
+ * @return {AudioPlayer}
+ *     A AudioPlayer instance supporting the given mimetype and
  *     reading from the given stream, or null if support for the given mimetype
  *     is absent.
  */
-Guacamole.AudioPlayer.getInstance = function getInstance(stream, mimetype) {
+AudioPlayer.getInstance = function getInstance(stream, mimetype) {
 
     // Use raw audio player if possible
-    if (Guacamole.RawAudioPlayer.isSupportedType(mimetype))
-        return new Guacamole.RawAudioPlayer(stream, mimetype);
+    if (RawAudioPlayer.isSupportedType(mimetype))
+        return new RawAudioPlayer(stream, mimetype);
 
     // No support for given mimetype
     return null;
@@ -106,29 +109,29 @@ Guacamole.AudioPlayer.getInstance = function getInstance(stream, mimetype) {
 };
 
 /**
- * Implementation of Guacamole.AudioPlayer providing support for raw PCM format
+ * Implementation of AudioPlayer providing support for raw PCM format
  * audio. This player relies only on the Web Audio API and does not require any
  * browser-level support for its audio formats.
  *
  * @constructor
- * @augments Guacamole.AudioPlayer
- * @param {!Guacamole.InputStream} stream
- *     The Guacamole.InputStream to read audio data from.
+ * @augments AudioPlayer
+ * @param {!InputStream} stream
+ *     The InputStream to read audio data from.
  *
  * @param {!string} mimetype
  *     The mimetype of the audio data in the provided stream, which must be a
  *     "audio/L8" or "audio/L16" mimetype with necessary parameters, such as:
  *     "audio/L16;rate=44100,channels=2".
  */
-Guacamole.RawAudioPlayer = function RawAudioPlayer(stream, mimetype) {
+function RawAudioPlayer(stream, mimetype) {
 
     /**
      * The format of audio this player will decode.
      *
      * @private
-     * @type {Guacamole.RawAudioFormat}
+     * @type {RawAudioFormat}
      */
-    var format = Guacamole.RawAudioFormat.parse(mimetype);
+    var format = RawAudioFormat.parse(mimetype);
 
     /**
      * An instance of a Web Audio API AudioContext object, or null if the
@@ -137,7 +140,7 @@ Guacamole.RawAudioPlayer = function RawAudioPlayer(stream, mimetype) {
      * @private
      * @type {AudioContext}
      */
-    var context = Guacamole.AudioContextFactory.getAudioContext();
+    var context = AudioContextFactory.getAudioContext();
 
     /**
      * The earliest possible time that the next packet could play without
@@ -151,13 +154,13 @@ Guacamole.RawAudioPlayer = function RawAudioPlayer(stream, mimetype) {
     var nextPacketTime = context.currentTime;
 
     /**
-     * Guacamole.ArrayBufferReader wrapped around the audio input stream
-     * provided with this Guacamole.RawAudioPlayer was created.
+     * ArrayBufferReader wrapped around the audio input stream
+     * provided with this RawAudioPlayer was created.
      *
      * @private
-     * @type {!Guacamole.ArrayBufferReader}
+     * @type {!ArrayBufferReader}
      */
-    var reader = new Guacamole.ArrayBufferReader(stream);
+    var reader = new ArrayBufferReader(stream);
 
     /**
      * The minimum size of an audio packet split by splitAudioPacket(), in
@@ -319,10 +322,10 @@ Guacamole.RawAudioPlayer = function RawAudioPlayer(stream, mimetype) {
 
     /**
      * Pushes the given packet of audio data onto the playback queue. Unlike
-     * other private functions within Guacamole.RawAudioPlayer, the type of the
+     * other private functions within RawAudioPlayer, the type of the
      * ArrayBuffer packet of audio data here need not be specific to the type
      * of audio (as with SampleArray). The ArrayBuffer type provided by a
-     * Guacamole.ArrayBufferReader, for example, is sufficient. Any necessary
+     * ArrayBufferReader, for example, is sufficient. Any necessary
      * conversions will be performed automatically internally.
      *
      * @private
@@ -455,31 +458,31 @@ Guacamole.RawAudioPlayer = function RawAudioPlayer(stream, mimetype) {
 
 };
 
-Guacamole.RawAudioPlayer.prototype = new Guacamole.AudioPlayer();
+RawAudioPlayer.prototype = new AudioPlayer();
 
 /**
  * Determines whether the given mimetype is supported by
- * Guacamole.RawAudioPlayer.
+ * RawAudioPlayer.
  *
  * @param {!string} mimetype
  *     The mimetype to check.
  *
  * @returns {!boolean}
- *     true if the given mimetype is supported by Guacamole.RawAudioPlayer,
+ *     true if the given mimetype is supported by RawAudioPlayer,
  *     false otherwise.
  */
-Guacamole.RawAudioPlayer.isSupportedType = function isSupportedType(mimetype) {
+RawAudioPlayer.isSupportedType = function isSupportedType(mimetype) {
 
     // No supported types if no Web Audio API
-    if (!Guacamole.AudioContextFactory.getAudioContext())
+    if (!AudioContextFactory.getAudioContext())
         return false;
 
-    return Guacamole.RawAudioFormat.parse(mimetype) !== null;
+    return RawAudioFormat.parse(mimetype) !== null;
 
 };
 
 /**
- * Returns a list of all mimetypes supported by Guacamole.RawAudioPlayer. Only
+ * Returns a list of all mimetypes supported by RawAudioPlayer. Only
  * the core mimetypes themselves will be listed. Any mimetype parameters, even
  * required ones, will not be included in the list. For example, "audio/L8" is
  * a raw audio mimetype that may be supported, but it is invalid without
@@ -487,14 +490,14 @@ Guacamole.RawAudioPlayer.isSupportedType = function isSupportedType(mimetype) {
  * however (see https://tools.ietf.org/html/rfc4856).
  *
  * @returns {!string[]}
- *     A list of all mimetypes supported by Guacamole.RawAudioPlayer, excluding
+ *     A list of all mimetypes supported by RawAudioPlayer, excluding
  *     any parameters. If the necessary JavaScript APIs for playing raw audio
  *     are absent, this list will be empty.
  */
-Guacamole.RawAudioPlayer.getSupportedTypes = function getSupportedTypes() {
+RawAudioPlayer.getSupportedTypes = function getSupportedTypes() {
 
     // No supported types if no Web Audio API
-    if (!Guacamole.AudioContextFactory.getAudioContext())
+    if (!AudioContextFactory.getAudioContext())
         return [];
 
     // We support 8-bit and 16-bit raw PCM
@@ -503,4 +506,9 @@ Guacamole.RawAudioPlayer.getSupportedTypes = function getSupportedTypes() {
         'audio/L16'
     ];
 
+};
+
+export {
+    AudioPlayer as default,
+    RawAudioPlayer
 };

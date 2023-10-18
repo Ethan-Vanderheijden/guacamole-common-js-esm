@@ -17,33 +17,33 @@
  * under the License.
  */
 
-var Guacamole = Guacamole || {};
+import InputStream from './InputStream.js';
 
 /**
  * A reader which automatically handles the given input stream, assembling all
  * received blobs into a single blob by appending them to each other in order.
  * Note that this object will overwrite any installed event handlers on the
- * given Guacamole.InputStream.
+ * given InputStream.
  * 
  * @constructor
- * @param {!Guacamole.InputStream} stream
+ * @param {!InputStream} stream
  *     The stream that data will be read from.
  *
  * @param {!string} mimetype
  *     The mimetype of the blob being built.
  */
-Guacamole.BlobReader = function(stream, mimetype) {
+export default function BlobReader(stream, mimetype) {
 
     /**
-     * Reference to this Guacamole.InputStream.
+     * Reference to this InputStream.
      *
      * @private
-     * @type {!Guacamole.BlobReader}
+     * @type {!BlobReader}
      */
     var guac_reader = this;
 
     /**
-     * The length of this Guacamole.InputStream in bytes.
+     * The length of this InputStream in bytes.
      *
      * @private
      * @type {!number}
@@ -102,20 +102,20 @@ Guacamole.BlobReader = function(stream, mimetype) {
     };
 
     /**
-     * Returns the current length of this Guacamole.InputStream, in bytes.
+     * Returns the current length of this InputStream, in bytes.
      *
      * @return {!number}
-     *     The current length of this Guacamole.InputStream.
+     *     The current length of this InputStream.
      */
     this.getLength = function() {
         return length;
     };
 
     /**
-     * Returns the contents of this Guacamole.BlobReader as a Blob.
+     * Returns the contents of this BlobReader as a Blob.
      *
      * @return {!Blob}
-     *     The contents of this Guacamole.BlobReader.
+     *     The contents of this BlobReader.
      */
     this.getBlob = function() {
         return blob_builder.getBlob();
