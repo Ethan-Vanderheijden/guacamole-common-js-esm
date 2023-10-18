@@ -1,2 +1,15 @@
-*~
-target/
+/*
+/*/
+!guacamole-common-js/
+
+guacamole-common-js/*
+!guacamole-common-js/src/
+
+guacamole-common-js/src/*
+!guacamole-common-js/src/main/
+
+guacamole-common-js/src/main/webapp/*
+!guacamole-common-js/src/main/webapp/modules/
+
+!/.gitignore
+!README
