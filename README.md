@@ -1,4 +1,4 @@
-[![Tests](https://github.com/Ethan-Vanderheijden/guacamole-common-js-esm/actions/workflows/CI.yml/badge.svg)](https://github.com/Ethan-Vanderheijden/guacamole-common-js-esm/actions/workflows/CI.yml)
+[![npm version](https://img.shields.io/npm/v/guacamole-common-js-esm.svg)](https://www.npmjs.com/package/guacamole-common-js-esm) [![Tests](https://github.com/Ethan-Vanderheijden/guacamole-common-js-esm/actions/workflows/CI.yml/badge.svg)](https://github.com/Ethan-Vanderheijden/guacamole-common-js-esm/actions/workflows/CI.yml)
 
 # guacamole-common-js ported to ESM
 
@@ -30,7 +30,7 @@ npm install --save guacamole-common-js-esm
 import { Client, Mouse, Keyboard } from 'guacamole-common-js';
 ```
 
-Read the [documentation](https://guacamole.apache.org/doc/guacamole-common-js/) for a list of every class you can import. Imports correspond one-to-one with the original guacamole-common-js, but you no longer need to preface them with `Guacamole.` namespace. It is recommended that you use a bundler with tree shaking support, such as [Rollup](https://rollupjs.org/) or [Webpack](https://webpack.js.org/).
+Read the [documentation](https://guacamole.apache.org/doc/guacamole-common-js/) for a list of every class you can import. Imports correspond one-to-one with the original guacamole-common-js, but you no longer need to preface them with `Guacamole.` namespace.
 
 ## Version numbers
 I intend to keep the npm version numbers identical to each release of guacamole. If I screw something up and need to release a patch, I will add a letter designating the patch (e.g. `1.0.0-b`).
