@@ -1,6 +1,6 @@
 {
   "name": "guacamole-common-js-esm",
-  "version": "1.5.3",
+  "version": "1.5.4",
   "description": "guacamole-common-js ported to ESM",
   "type": "module",
   "exports": {

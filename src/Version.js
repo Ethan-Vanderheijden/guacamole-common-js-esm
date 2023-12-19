@@ -25,4 +25,4 @@
  *
  * @type {!string}
  */
-export const API_VERSION = "1.5.3";
+export const API_VERSION = "1.5.4";

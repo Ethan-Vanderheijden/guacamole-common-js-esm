@@ -2,6 +2,7 @@
 /*/
 !src/
 !test/
+!.github/
 
 !/.gitignore
 !README.md
